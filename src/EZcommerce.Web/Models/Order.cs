@@ -55,4 +55,8 @@ public class Order
     [Required]
     [StringLength(100)]
     public DateTime CreatedAt {get; set;}
+
+    public ICollection<OrderItem> OrderItems = new List<OrderItem>();
+
+    public Payment? Payment {get; set;}
 }

@@ -34,4 +34,6 @@ public class Product
 
     public Inventory? Inventory {get; set;}
 
+    public ICollection<OrderItem> OrderItems = new List<OrderItem> ();
+
 }
