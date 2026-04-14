@@ -15,6 +15,8 @@ public class StatusChangeLog
     [StringLength(100)]
     public required string NewStatus {get; set;}
 
+    // Need some sort of tracking of Order/Payment Id that it refers to
+
     [Required]
     [StringLength(100)]
     public string? User {get; set;}

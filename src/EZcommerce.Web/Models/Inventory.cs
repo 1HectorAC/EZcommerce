@@ -13,6 +13,7 @@ public class Inventory
     public Product? Product {get; set;}
 
     [Required]
+    [Range(0,999999999)]
     public int Quantity {get; set;} = 0;
 
     

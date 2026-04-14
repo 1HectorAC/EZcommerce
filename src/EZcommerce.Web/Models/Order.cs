@@ -46,8 +46,9 @@ public class Order
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
-    public required decimal TotalAmmount {get; set;}
+    public decimal TotalAmmount {get; set;}
 
+    // consider adding Status Model
     [Required]
     [StringLength(100)]
     public required string Status {get; set;} = "Processing";
