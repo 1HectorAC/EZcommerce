@@ -1,6 +1,8 @@
 
 using DotNetEnv;
 using EZcommerce.Web.Data;
+using EZcommerce.Web.Repositories;
+using EZcommerce.Web.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -14,6 +16,7 @@ Env.Load();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<EZcommerceDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("DB_Connection")));
+builder.Services.AddScoped<IEZcommerceRepository, EZcommerceRepository>();
 
 var app = builder.Build();
 
