@@ -1,7 +1,19 @@
+
+using DotNetEnv;
+using EZcommerce.Web.Data;
+using Microsoft.EntityFrameworkCore;
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<EZcommerceDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("DB_Connection")));
 
 var app = builder.Build();
 
