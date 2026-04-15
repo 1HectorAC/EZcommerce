@@ -5,3 +5,10 @@
 <h5>@Model.Name</h5>
 <p>@Model.Price</p>
 <p>@Model.Description</p>
+<a 
+    asp-controller="Cart" 
+    asp-action="Add" 
+    asp-route-ProductId=@Model.Id
+    asp-route-Name=@Model.Name
+    asp-route-PriceSnapShot=@Model.Price>AddToCart</a>
+<a asp-controller="Cart" asp-action="Remove" asp-route-id=@Model.Id>RemoveCart</a>

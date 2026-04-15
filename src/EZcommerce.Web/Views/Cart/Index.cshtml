@@ -1,0 +1,11 @@
+@using EZcommerce.Web.Models.Session
+@model List<EZcommerce.Web.Models.Session.CartItem>
+
+<h1>Shopping Cart</h1>
+<hr />
+
+@foreach(CartItem cartItem in Model){
+    <h5>@cartItem.Name</h5>
+    <p>$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
+    <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId>Remove</a>
+}
