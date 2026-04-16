@@ -55,5 +55,12 @@ public class CartController: Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
+    public IActionResult GetCartCount()
+    {
+        int totalCount = _cart.GetCount();
+        return Ok(totalCount);
+    }
+
 
 }

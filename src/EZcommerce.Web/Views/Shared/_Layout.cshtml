@@ -30,7 +30,7 @@
                     <ul class="navbar-nav ms-auto">
                         
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Shopping Cart</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Shopping Cart (@await Component.InvokeAsync("CartCount") )</a>
                         </li>
                     </ul>
                 </div>

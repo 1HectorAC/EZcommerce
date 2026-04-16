@@ -7,6 +7,8 @@ public interface ICartService
 {
     List<CartItem> GetCart();
 
+    int GetCount();
+
     int GetCartItemQuantity(int productId);
 
     void SaveCart(List<CartItem> cart);

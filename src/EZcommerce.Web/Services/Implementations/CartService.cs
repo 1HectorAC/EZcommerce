@@ -24,6 +24,12 @@ public class CartService: ICartService
         return JsonSerializer.Deserialize<List<CartItem>>(value) ?? new List<CartItem>();
     }
 
+    public int GetCount()
+    {
+        var cart = GetCart();
+        return cart.Count;
+    }
+
     public int GetCartItemQuantity(int productId)
     {
         var cart = GetCart();
