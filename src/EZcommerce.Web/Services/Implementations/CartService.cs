@@ -24,6 +24,15 @@ public class CartService: ICartService
         return JsonSerializer.Deserialize<List<CartItem>>(value) ?? new List<CartItem>();
     }
 
+    public int GetCartItemQuantity(int productId)
+    {
+        var cart = GetCart();
+        var existing = cart.FirstOrDefault(i => i.ProductId == productId);
+        if(existing == null)
+            return 0;
+        return existing.Quantity;
+    }
+
     public void SaveCart(List<CartItem> cart)
     {
         var value = JsonSerializer.Serialize(cart);
@@ -51,6 +60,29 @@ public class CartService: ICartService
         var cart = GetCart();
         cart.RemoveAll(i => i.ProductId == productId);
         SaveCart(cart);
+    }
+
+    public void DecrementCartItemQuantity(int productId)
+    {
+        var cart = GetCart();
+        var existing = cart.FirstOrDefault(i => i.ProductId == productId);
+    
+        if(existing is null || existing.Quantity <= 0)
+        {
+            Console.WriteLine("DecrementCartItemQuantity: No productId found");
+            // Maybe return error instead
+            return;
+        }
+        if(existing.Quantity == 1)
+        {
+            // Maybe return error instead, not its responsibility
+            RemoveFromCart(productId); 
+        }
+        else
+        {
+            existing.Quantity -= 1;
+            SaveCart(cart);
+        }
     }
 
     public void ClearCart()

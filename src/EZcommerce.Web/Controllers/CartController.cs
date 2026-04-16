@@ -1,4 +1,5 @@
 
+using System.Text.Json.Serialization;
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,30 @@ public class CartController: Controller
 
         _cart.AddToCart(cartItem);
         return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult Add2([FromBody] CartItem cartItem)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest("Inputed data was not properly formated");
+        }
+        Console.WriteLine($"productId: {cartItem.ProductId} name; {cartItem.Name}");
+        _cart.AddToCart(cartItem);
+        
+        //consider returning quantity
+        return Ok(1);
+    }
+
+    [HttpGet("[controller]/LowerQuantity/{productId}")]
+    public IActionResult LowerQuantity([FromRoute] int productId)
+    {
+        Console.WriteLine("CartController productId: " + productId);
+        _cart.DecrementCartItemQuantity(productId);
+
+        //consider returning quantity
+        return Ok(1);
     }
 
     public IActionResult Remove(int id)

@@ -5,10 +5,92 @@
 <h5>@Model.Name</h5>
 <p>@Model.Price</p>
 <p>@Model.Description</p>
-<a 
-    asp-controller="Cart" 
-    asp-action="Add" 
-    asp-route-ProductId=@Model.Id
-    asp-route-Name=@Model.Name
-    asp-route-PriceSnapShot=@Model.Price>AddToCart</a>
-<a asp-controller="Cart" asp-action="Remove" asp-route-id=@Model.Id>RemoveCart</a>
+
+<br/>
+
+<!-- Cart buttons setup -->
+<button 
+    class="btn btn-primary addCartButton" 
+    hidden=@(ViewBag.cartItemQuantity == 0? false : true)>
+    AddToCart 
+</button>
+
+<div 
+    class="quantityChanger" 
+    style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0? true : false)>
+    <button class = "minusQuantity" style="display:inline">
+        -
+    </button>
+    <p class="quantityText" style="display:inline">
+        @ViewBag.cartItemQuantity
+    </p>
+    <button class = "addQuantity">+</button>
+</div>
+
+<script>
+    const data = {Name : '@Model.Name', ProductId : @Model.Id, PriceSnapshot : @Model.Price}
+    document.querySelector(".addCartButton").addEventListener("click", event => {
+        fetch("/Cart/Add2", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if(!response.ok){
+                throw new Error ("Error with server")
+            }
+            return response.json();
+        }).then(data => {
+            console.log("Success");
+            // consider updating quantity via check/return value rather than updating local value
+            var value = Number(document.querySelector(".quantityText").textContent);
+            document.querySelector(".quantityText").textContent = value + 1;
+
+            document.querySelector(".addCartButton").hidden = true;
+            document.querySelector(".quantityChanger").hidden = false;
+        }).catch(error => {
+            console.log("error");
+        });
+    });
+
+    document.querySelector(".addQuantity").addEventListener("click", event => {
+        fetch("/Cart/Add2", {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if(!response.ok){
+                    throw new Error ("Error with server")
+                }
+                return response.json();
+            }).then(data => {
+                console.log("Success");
+                var value = Number(document.querySelector(".quantityText").textContent);
+                document.querySelector(".quantityText").textContent = value + 1;
+            }).catch(error => {
+                console.log("error");
+        });
+    });
+
+    document.querySelector(".minusQuantity").addEventListener("click", event => {
+        fetch("/Cart/LowerQuantity/@(Model.Id)")
+            .then(response => {
+                if(!response.ok){
+                    throw new Error ("Error with server")
+                }
+                return response.json();
+            }).then(data => {
+                console.log("Success");
+                var value = Number(document.querySelector(".quantityText").textContent);
+                // value is 1, need to disable quantitySection, enable AddToCart button
+                if(value == 1){
+                    document.querySelector(".quantityChanger").hidden = true;
+                    document.querySelector(".addCartButton").hidden = false;
+                }
+                document.querySelector(".quantityText").textContent = value - 1;
+            }).catch(error => {
+                console.log("error:" + error);
+        });
+    });
+</script>

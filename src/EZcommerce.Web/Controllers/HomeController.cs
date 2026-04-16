@@ -4,16 +4,19 @@ using EZcommerce.Web.Models;
 using EZcommerce.Web.Data;
 using EZcommerce.Web.Repositories;
 using EZcommerce.Web.Models.ViewModels;
+using EZcommerce.Web.Services;
 
 namespace EZcommerce.Web.Controllers;
 
 public class HomeController : Controller
 {
     private readonly IEZcommerceRepository _service;
+    private readonly ICartService _cart;
 
-    public HomeController(IEZcommerceRepository service)
+    public HomeController(IEZcommerceRepository service, ICartService cart)
     {
         _service = service;
+        _cart = cart;
 
     }
 
@@ -38,8 +41,9 @@ public class HomeController : Controller
             Price = product.Price,
             ImageUrl = product.ImageUrl,
             Category = ""
-
         };
+        ViewBag.cartItemQuantity = _cart.GetCartItemQuantity(id);
+
         return View(productInfo);
     }
 
