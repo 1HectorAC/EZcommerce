@@ -9,7 +9,10 @@ public interface ICartService
 
     int GetCount();
 
+    int GetInventoryCount();
+
     int GetCartItemQuantity(int productId);
+
 
     void SaveCart(List<CartItem> cart);
 

@@ -62,5 +62,11 @@ public class CartController: Controller
         return Ok(totalCount);
     }
 
+    [HttpGet]
+    public IActionResult GetInventoryCount()
+    {
+        int totalCount = _cart.GetInventoryCount();
+        return Ok(totalCount);
+    }
 
 }

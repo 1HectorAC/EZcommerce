@@ -30,6 +30,12 @@ public class CartService: ICartService
         return cart.Count;
     }
 
+    public int GetInventoryCount()
+    {
+        var cart = GetCart();
+        return cart.Sum(i => i.Quantity);
+    }
+
     public int GetCartItemQuantity(int productId)
     {
         var cart = GetCart();

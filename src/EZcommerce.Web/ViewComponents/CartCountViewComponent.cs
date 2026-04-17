@@ -12,7 +12,7 @@ public class CartCountViewComponent: ViewComponent
     }
     public IViewComponentResult Invoke()
     {
-        var count = _cart.GetCount();
+        var count = _cart.GetInventoryCount();
         return View(count);
     }
 }

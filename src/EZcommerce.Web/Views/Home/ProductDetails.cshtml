@@ -3,94 +3,96 @@
 <h1> Product Details Page</h1>
 
 <h5>@Model.Name</h5>
-<p>@Model.Price</p>
+<p>$@Model.Price</p>
 <p>@Model.Description</p>
 
-<br/>
+<br />
 
 <!-- Cart buttons setup -->
-<button 
-    class="btn btn-primary addCartButton" 
-    hidden=@(ViewBag.cartItemQuantity == 0? false : true)>
-    AddToCart 
-</button>
-
-<div 
-    class="quantityChanger" 
-    style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0? true : false)>
-    <button class = "minusQuantity" style="display:inline">
-        -
-    </button>
-    <p class="quantityText" style="display:inline">
-        @ViewBag.cartItemQuantity
-    </p>
-    <button class = "addQuantity">+</button>
+<div>
+    <div class="addCartButton" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? false : true)>
+        <button class="btn btn-primary ">
+            Add to Cart
+        </button>
+    </div>
+    
+    <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true : false)>
+        <button class="btn btn-primary minusQuantity" style="display:inline-block">-</button>
+        <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">@ViewBag.cartItemQuantity</p>
+        <button class="btn btn-primary addQuantity" style="display:inline-block">+</button>
+    </div>
 </div>
 
-<script>
-    const data = {Name : '@Model.Name', ProductId : @Model.Id, PriceSnapshot : @Model.Price}
-    document.querySelector(".addCartButton").addEventListener("click", event => {
-        fetch("/Cart/Add2", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if(!response.ok){
-                throw new Error ("Error with server")
-            }
-            return response.json();
-        }).then(data => {
-            console.log("Success");
-            // consider updating quantity via check/return value rather than updating local value
-            var value = Number(document.querySelector(".quantityText").textContent);
-            document.querySelector(".quantityText").textContent = value + 1;
-
-            document.querySelector(".addCartButton").hidden = true;
-            document.querySelector(".quantityChanger").hidden = false;
-        }).catch(error => {
-            console.log("error");
-        });
-    });
-
-    document.querySelector(".addQuantity").addEventListener("click", event => {
-        fetch("/Cart/Add2", {
+@section Scripts {
+    <script>
+        const data = { Name: '@Model.Name', ProductId: @Model.Id, PriceSnapshot: @Model.Price}
+        document.querySelector(".addCartButton").addEventListener("click", event => {
+            fetch("/Cart/Add2", {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            })
-            .then(response => {
-                if(!response.ok){
-                    throw new Error ("Error with server")
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("Error with server")
                 }
                 return response.json();
             }).then(data => {
                 console.log("Success");
+                // consider updating quantity via check/return value rather than updating local value
                 var value = Number(document.querySelector(".quantityText").textContent);
                 document.querySelector(".quantityText").textContent = value + 1;
+
+                document.querySelector(".addCartButton").hidden = true;
+                document.querySelector(".quantityChanger").hidden = false;
+
+                refreshCartCount();
             }).catch(error => {
                 console.log("error");
+            });
         });
-    });
 
-    document.querySelector(".minusQuantity").addEventListener("click", event => {
-        fetch("/Cart/LowerQuantity/@(Model.Id)")
-            .then(response => {
-                if(!response.ok){
-                    throw new Error ("Error with server")
+        document.querySelector(".addQuantity").addEventListener("click", event => {
+            fetch("/Cart/Add2", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("Error with server")
                 }
                 return response.json();
             }).then(data => {
-                console.log("Success");
                 var value = Number(document.querySelector(".quantityText").textContent);
-                // value is 1, need to disable quantitySection, enable AddToCart button
-                if(value == 1){
-                    document.querySelector(".quantityChanger").hidden = true;
-                    document.querySelector(".addCartButton").hidden = false;
-                }
-                document.querySelector(".quantityText").textContent = value - 1;
+                document.querySelector(".quantityText").textContent = value + 1;
+                refreshCartCount()
             }).catch(error => {
-                console.log("error:" + error);
+                console.log("error");
+            });
         });
-    });
-</script>
+
+        document.querySelector(".minusQuantity").addEventListener("click", event => {
+            fetch("/Cart/LowerQuantity/@(Model.Id)")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error with server")
+                    }
+                    return response.json();
+                }).then(data => {
+                    var value = Number(document.querySelector(".quantityText").textContent);
+                    // value is 1, need to disable quantitySection, enable AddToCart button
+                    if (value == 1) {
+                        document.querySelector(".quantityChanger").hidden = true;
+                        document.querySelector(".addCartButton").hidden = false;
+                    }
+                    document.querySelector(".quantityText").textContent = value - 1;
+                    //consider adding update to UI immidiatly, with refresh serving as check afterwards
+                    refreshCartCount();
+                }).catch(error => {
+                    console.log("error:" + error);
+                });
+        });
+
+    
+        
+    </script>
+}
