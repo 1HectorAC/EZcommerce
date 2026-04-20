@@ -3,9 +3,18 @@
     ViewData["Title"] = "Home Page";
 }
 
-<h1>Home page</h1>
 
-@foreach(Product product in Model){
+<div class="headerPanel">
+    <div>
+        <h1>EZcommerce</h1>
+        <p><i>Where commerce is easy, you buy easy... or something like that.</i></p>
+    </div>
+
+</div>
+
+
+@foreach (Product product in Model)
+{
     <div>
         <h5>@product.Name</h5>
         <p>$@product.Price</p>
