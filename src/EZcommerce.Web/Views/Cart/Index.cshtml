@@ -4,8 +4,30 @@
 <h1>Shopping Cart</h1>
 <hr />
 
-@foreach(CartItem cartItem in Model){
+@foreach (CartItem cartItem in Model)
+{
     <h5>@cartItem.Name</h5>
     <p>$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
     <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId>Remove</a>
 }
+
+<button class="btn btn-primary" id="checkoutButton">Checkout</button>
+<script>
+    document.querySelector("#checkoutButton").addEventListener("click", event => {
+        fetch('/Checkout/CreateSession', {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => {
+            if (!response.ok)
+                throw new Error('Error.. again');
+            return response.json();
+        }).then(data => {
+            console.log("data received", data);
+            window.location = data.url;
+        }).catch(error => {
+            console.log("error: ", error);
+            // maybe redirect to error page
+        })
+    });
+        
+</script>
