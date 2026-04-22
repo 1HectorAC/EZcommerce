@@ -1,4 +1,5 @@
 
+using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +16,23 @@ public class CheckoutController: Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSession()
+    public async Task<IActionResult> CreateSession([FromBody] List<CartItem> cartItems)
     {
-        //var session = await _service.CreateCheckoutSession();
+        if(cartItems.Count <= 0)
+            return BadRequest("No Items in Cart Found.");
+        
 
+        // check cart productIds exits
+        // check prices, redirect if error
+        // check inventory, redirect if error
+
+        var session = await _service.CreateCheckoutSession(cartItems);
+        Console.WriteLine("session ended");
         // Create Order/OrderItem/Payment Objects here
         // Change Inventory quantity here
 
         // return session.url
-        return Json(new {url = "/Checkout/Success"});
+        return Json(new {url = session.Url});
     }
 
 public IActionResult Success()

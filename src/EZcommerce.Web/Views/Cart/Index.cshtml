@@ -1,4 +1,5 @@
 @using EZcommerce.Web.Models.Session
+@using System.Text.Json
 @model List<EZcommerce.Web.Models.Session.CartItem>
 
 <h1>Shopping Cart</h1>
@@ -10,23 +11,31 @@
     <p>$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
     <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId>Remove</a>
 }
+<br />
 
 <button class="btn btn-primary" id="checkoutButton">Checkout</button>
 <script>
+    const cartItems = @Html.Raw(JsonSerializer.Serialize(Model));
+
     document.querySelector("#checkoutButton").addEventListener("click", event => {
+        // display load circle on page
         fetch('/Checkout/CreateSession', {
             method: "POST",
-            headers: { 'Content-Type': 'application/json' }
-        }).then(response => {
-            if (!response.ok)
-                throw new Error('Error.. again');
+            headers: { 'Content-Type': 'application/json' },
+            body : JSON.stringify(cartItems)
+        }).then(async response => {
+            if (!response.ok){
+                const errorData = await response.text();
+                throw new Error(errorData);
+            }
+                
             return response.json();
         }).then(data => {
             console.log("data received", data);
             window.location = data.url;
         }).catch(error => {
-            console.log("error: ", error);
-            // maybe redirect to error page
+            console.log("Fetch failed: ", error.message);
+            // maybe redirect to error page, or display error
         })
     });
         
