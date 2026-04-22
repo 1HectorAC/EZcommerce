@@ -35,6 +35,8 @@
             window.location = data.url;
         }).catch(error => {
             console.log("Fetch failed: ", error.message);
+            alert(`Error: ${error.message}. Removing everything from cart.`);
+            location.reload();
             // maybe redirect to error page, or display error
         })
     });

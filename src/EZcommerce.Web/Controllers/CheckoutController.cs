@@ -1,6 +1,7 @@
 
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Services;
+using EZcommerce.Web.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EZcommerce.Web.Controllers;
@@ -9,10 +10,15 @@ namespace EZcommerce.Web.Controllers;
 public class CheckoutController: Controller
 {
     
-    private readonly CheckoutService _service;
-    public CheckoutController(CheckoutService service)
+    private readonly CheckoutService _checkoutService;
+    private readonly IEZcommerceService _service;
+
+    private readonly ICartService _cartService;
+    public CheckoutController(CheckoutService checkoutService, IEZcommerceService service, ICartService cartService)
     {
+        _checkoutService = checkoutService;
         _service = service;
+        _cartService = cartService;
     }
 
     [HttpPost]
@@ -20,13 +26,17 @@ public class CheckoutController: Controller
     {
         if(cartItems.Count <= 0)
             return BadRequest("No Items in Cart Found.");
-        
+        try
+        {
+           _service.ValidateCart(cartItems) ;
+        }catch(Exception ex)
+        {
+            // Maybe just remove invalid cart items instead of clearing
+            _cartService.ClearCart();
+            return BadRequest(ex.Message);
+        }
 
-        // check cart productIds exits
-        // check prices, redirect if error
-        // check inventory, redirect if error
-
-        var session = await _service.CreateCheckoutSession(cartItems);
+        var session = await _checkoutService.CreateCheckoutSession(cartItems);
         Console.WriteLine("session ended");
         // Create Order/OrderItem/Payment Objects here
         // Change Inventory quantity here
