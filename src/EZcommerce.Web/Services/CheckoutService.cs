@@ -1,23 +1,26 @@
 
+using EZcommerce.Models.Settings;
 using EZcommerce.Web.Models.Session;
+using Sprache;
 using Stripe;
 using Stripe.Checkout;
+using Microsoft.Extensions.Options;
 
 namespace EZcommerce.Web.Services;
 
 public class CheckoutService
 {
-    
+    private readonly StripeSettings _stripeSettings;
     private readonly StripeClient _client;
 
-    public CheckoutService(IConfiguration config)
+    public CheckoutService(IOptions<StripeSettings> stripeSettings)
     {
-        _client = new StripeClient(config["STRIPE:SECRETKEY"]);
+        _stripeSettings = stripeSettings.Value;
+        _client = new StripeClient(_stripeSettings.SecretKey);
 
     }
-    
 
-    public async Task<Session> CreateCheckoutSession(List<CartItem> cartItems)
+    public async Task<Session> CreateCheckoutSession(List<CartItem> cartItems, string orderId)
     {
         var sessionItems = cartItems.Select(i => new SessionLineItemOptions
         {
@@ -33,11 +36,18 @@ public class CheckoutService
                         }
         }).ToList();
 
+        // Used to get Order in webhook
+        var metaData = new Dictionary<string, string>
+        {
+            {"orderId", orderId}
+        };
+
         var options = new SessionCreateOptions
             {
                 Mode = "payment",
                 SuccessUrl = "http://localhost:5191/Checkout/Success",
                 CancelUrl = "http://localhost:5191/Checkout/Cancel",
+                Metadata = metaData,
                 LineItems = sessionItems
             };
 

@@ -36,7 +36,10 @@ public class CheckoutController: Controller
             return BadRequest(ex.Message);
         }
 
-        var session = await _checkoutService.CreateCheckoutSession(cartItems);
+        // Make order/OrderItem
+
+        // pass string of orderId below
+        var session = await _checkoutService.CreateCheckoutSession(cartItems, "1");
         Console.WriteLine("session ended");
         // Create Order/OrderItem/Payment Objects here
         // Change Inventory quantity here

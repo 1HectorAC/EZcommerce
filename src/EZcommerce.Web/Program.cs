@@ -1,5 +1,6 @@
 
 using DotNetEnv;
+using EZcommerce.Models.Settings;
 using EZcommerce.Web.Data;
 using EZcommerce.Web.Repositories;
 using EZcommerce.Web.Repositories.Implementations;
@@ -14,8 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
-
-
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("STRIPE"));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
