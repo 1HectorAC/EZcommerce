@@ -11,14 +11,21 @@
     </div>
 
 </div>
+<br />
+<h5 style="padding-left:10px">Newest Items:</h5>
+<hr />
 
-
+<div class="gridParent">
 @foreach (Product product in Model)
 {
-    <div>
-        <h5>@product.Name</h5>
+    <a asp-controller="Home" asp-action="ProductDetails" asp-route-id=@product.Id style="text-decoration:none; color:inherit">
+    <div class="gridItem">
+        <div class="pictureBox"><h2>No picture</h2></div>
+        <h5><u>@product.Name</u></h5>
         <p>$@product.Price</p>
-        <a asp-controller="Home" asp-action="ProductDetails" asp-route-id=@product.Id>Details</a>
+        
 
     </div>
+    </a>
 }
+</div>

@@ -50,3 +50,34 @@ body {
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
+.gridParent {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gridItem {
+  text-decoration: none;
+  align-items: center;
+  border: 2px solid rgb(209, 224, 239);
+  border-radius: 5px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.gridItem:hover{
+  background-color: rgb(234, 239, 245);
+}
+
+.pictureBox{
+  width:200px;
+   height:200px;
+    background-color:rgb(212, 227, 239);
+   border-radius: 5px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
