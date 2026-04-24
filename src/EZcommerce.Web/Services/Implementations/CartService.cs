@@ -45,6 +45,13 @@ public class CartService: ICartService
         return existing.Quantity;
     }
 
+    public decimal GetTotalPrice()
+    {
+        var cart = GetCart();
+        var totalPrice = cart.Sum(i => i.PriceSnapshot * i.Quantity);
+        return Math.Round(totalPrice, 2);
+    }
+
     public void SaveCart(List<CartItem> cart)
     {
         var value = JsonSerializer.Serialize(cart);

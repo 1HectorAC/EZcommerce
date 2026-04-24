@@ -1,4 +1,6 @@
 
+using EZcommerce.Web.Data;
+using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Services;
 using EZcommerce.Web.Services.Implementations;
@@ -12,7 +14,6 @@ public class CheckoutController: Controller
     
     private readonly CheckoutService _checkoutService;
     private readonly IEZcommerceService _service;
-
     private readonly ICartService _cartService;
     public CheckoutController(CheckoutService checkoutService, IEZcommerceService service, ICartService cartService)
     {
@@ -24,6 +25,7 @@ public class CheckoutController: Controller
     [HttpPost]
     public async Task<IActionResult> CreateSession([FromBody] List<CartItem> cartItems)
     {
+
         if(cartItems.Count <= 0)
             return BadRequest("No Items in Cart Found.");
         try
@@ -36,15 +38,16 @@ public class CheckoutController: Controller
             return BadRequest(ex.Message);
         }
 
-        // Make order/OrderItem
+        var orderId = await _service.InitiateOrderFromCartItems(cartItems);
+
+        // Note: check if concurent inventory update issue exists later.
+        // Note: Add error handling/rollback of order if inventory change fail
+        await _service.LowerInventoriesByCartItems(cartItems);
 
         // pass string of orderId below
-        var session = await _checkoutService.CreateCheckoutSession(cartItems, "1");
-        Console.WriteLine("session ended");
-        // Create Order/OrderItem/Payment Objects here
-        // Change Inventory quantity here
+       var session = await _checkoutService.CreateCheckoutSession(cartItems, orderId.ToString());
+        Console.WriteLine("Stripe checkout session created.");
 
-        // return session.url
         return Json(new {url = session.Url});
     }
 

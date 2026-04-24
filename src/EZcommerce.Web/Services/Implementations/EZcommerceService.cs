@@ -49,4 +49,92 @@ public class EZcommerceService : IEZcommerceService
         if (product!.Inventory!.Quantity < item.Quantity)
             throw new Exception("Not enough Inventory");
     }
+
+    public async Task<int> InitiateOrderFromCartItems(List<CartItem> items)
+    {
+        List<OrderItem> orderItems = new List<OrderItem>();
+        foreach (var item in items)
+        {
+            orderItems.Add(new OrderItem
+            {
+                ProductId = item.ProductId,
+                Quantity = item.Quantity,
+                PriceAtPurchase = item.PriceSnapshot
+            });
+        }
+
+        var totalPrice = Math.Round(items.Sum(i => i.PriceSnapshot * i.Quantity), 2);
+        var order = new Order
+        {
+            CustomerName = "",
+            CustomerEmail = "",
+            CustomerPhone = "",
+            ShippingAddressLine1 = "",
+            ShippingAddressLine2 = "",
+            City = "",
+            State = "",
+            ZipCode = "",
+            Country = "",
+            TotalAmmount = totalPrice,
+            Status = "Processing",
+            CreatedAt = DateTime.UtcNow,
+            OrderItems = orderItems
+        };
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+        return order.Id;
+    }
+
+    public async Task LowerInventoriesByCartItems(List<CartItem> items)
+    {
+        foreach(var item in items){
+            var inventory = _context.Inventories.FirstOrDefault(i => i.ProductId == item.ProductId);
+            if(inventory == null)
+                throw new Exception("Inventory not exits error");
+            inventory.Quantity -= item.Quantity;
+
+        }
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task OrderInventoryRollback(int orderId)
+    {
+        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
+        if (order is null)
+            throw new Exception("Order not exits in OrderInventoryRollback function");
+        var orderItems = _context.OrderItems
+            .Include(i => i.Product)
+            .ThenInclude(j => j!.Inventory)
+            .Where(i => i.OrderId == orderId);
+        foreach(var item in orderItems)
+        {
+            item.Product!.Inventory!.Quantity += item.Quantity;
+        }
+        _context.Orders.Remove(order);
+
+
+
+    }
+
+    public void OrderRemove(int orderId)
+    {
+        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
+        if(order is null)
+        {
+            throw new Exception("OrderRemove: Order does not exits.");
+        }
+        _context.Orders.Remove(order);
+    }
+
+    void OrderUpdate()
+    {
+        
+    }
+
+    void PaymentCreate()
+    {
+        
+    }
+
+
 }
