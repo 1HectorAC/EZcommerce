@@ -1,27 +1,46 @@
 @model EZcommerce.Web.Models.ViewModels.ProductDetailsViewModel
 
-<h1> Product Details Page</h1>
+<div class="headerPanel">
+    <h1>Product Details</h1>
+</div>
+<br />
 
-<h5>@Model.Name</h5>
-<p>$@Model.Price</p>
-<p>@Model.Description</p>
+<div class="panelCard1Parent">
+    <div class="panelCard1">
+        <div>
+            <div class="pictureBox">
+                <h2>No picture</h2>
+            </div>
+        </div>
+        <div style="padding:20px">
+            <h5><u>@Model.Name</u></h5>
+            <p>$@Model.Price</p>
+            <p>Descriptions: @Model.Description</p>
+            <!-- Cart buttons setup -->
+            <div>
+                <div class="addCartButton" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? false : true)>
+                    <button class="btn btn-primary ">
+                        Add to Cart
+                    </button>
+                </div>
+                <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true :
+                                                                                                                                                                                                                                                                                                                                                                false)>
+                    <button class="btn btn-primary minusQuantity" style="display:inline-block">-</button>
+                    <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">
+                        @ViewBag.cartItemQuantity
+                    </p>
+                    <button class="btn btn-primary addQuantity" style="display:inline-block">+</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 
 <br />
 
-<!-- Cart buttons setup -->
-<div>
-    <div class="addCartButton" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? false : true)>
-        <button class="btn btn-primary ">
-            Add to Cart
-        </button>
-    </div>
-    
-    <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true : false)>
-        <button class="btn btn-primary minusQuantity" style="display:inline-block">-</button>
-        <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">@ViewBag.cartItemQuantity</p>
-        <button class="btn btn-primary addQuantity" style="display:inline-block">+</button>
-    </div>
-</div>
+
 
 @section Scripts {
     <script>
