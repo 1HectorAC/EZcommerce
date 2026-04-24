@@ -126,12 +126,12 @@ public class EZcommerceService : IEZcommerceService
         _context.Orders.Remove(order);
     }
 
-    void OrderUpdate()
+    public void OrderUpdate()
     {
         
     }
 
-    void PaymentCreate()
+    public void PaymentCreate()
     {
         
     }
