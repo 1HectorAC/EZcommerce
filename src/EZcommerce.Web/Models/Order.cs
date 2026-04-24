@@ -57,7 +57,7 @@ public class Order
     [StringLength(100)]
     public DateTime CreatedAt {get; set;}
 
-    public ICollection<OrderItem> OrderItems = new List<OrderItem>();
+    public ICollection<OrderItem> OrderItems {get; set;} = new List<OrderItem>();
 
     public Payment? Payment {get; set;}
 }
