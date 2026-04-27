@@ -1,4 +1,5 @@
 
+using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
 
 namespace EZcommerce.Web.Services;
@@ -15,7 +16,7 @@ public interface IEZcommerceService
 
     void OrderRemove(int orderId);
 
-    void OrderUpdate();
+    void OrderUpdate(int orderId, Order orderChanges);
 
-    void PaymentCreate();
+    void PaymentCreate(Payment payment);
 }

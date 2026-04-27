@@ -81,15 +81,44 @@ public class StripeWebhookcontroller: ControllerBase
         return Ok();
     }
 
-    public static async Task HandleCheckoutCompleted(Session session)
+    public async Task HandleCheckoutCompleted(Session session)
     {
+        Console.WriteLine("customer name:" + session.Customer.Name);
+        Console.WriteLine("Total amount:" + session.PaymentIntent.Amount);
+        Console.WriteLine("payment type:" + session.PaymentIntent.LatestCharge.PaymentMethodDetails.Type);
+        /*
+        var orderIdString = session.Metadata.GetValueOrDefault("orderId");
+        
+            if(orderIdString is null)
+                throw new Exception("orderId metadata in stripe session not set");
+        var orderId = Int32.Parse(orderIdString);
+
         Console.WriteLine("Start HandleChekcoutCompleted function");
+        var order = new Order
+        {
+            CustomerName = session.Customer.Name,
+            CustomerEmail = session.CustomerEmail,
+            CustomerPhone = session.Customer.Phone,
+            ShippingAddressLine1 = session.Customer.Shipping.Address.Line1,
+            ShippingAddressLine2 = session.Customer.Shipping.Address.Line2,
+            City = session.Customer.Shipping.Address.City,
+            State = session.Customer.Shipping.Address.State,
+            ZipCode = session.Customer.Shipping.Address.PostalCode,
+            Country = session.Customer.Shipping.Address.Country,
+            Status = "Paid"
+        };
+        _service.OrderUpdate(orderId, order);
         
-
-        // Edit Order: add fields, mark as "Paid"
-        // Create Payement
+        var payment = new Payment
+        {
+            OrderId = orderId,
+            Amount = session.PaymentIntent.Amount,
+            Method = session.PaymentIntent.LatestCharge.PaymentMethodDetails.Type,
+            Status = "Payed",
+            TransactionReference = ""
+        };
+        _service.PaymentCreate(payment);
+    */
         // send email
-        
-
     }
 }

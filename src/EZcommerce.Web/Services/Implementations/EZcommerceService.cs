@@ -111,9 +111,6 @@ public class EZcommerceService : IEZcommerceService
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
         _context.Orders.Remove(order);
-
-
-
     }
 
     public void OrderRemove(int orderId)
@@ -126,14 +123,31 @@ public class EZcommerceService : IEZcommerceService
         _context.Orders.Remove(order);
     }
 
-    public void OrderUpdate()
+    public void OrderUpdate(int orderId, Order orderChanges)
     {
-        
+        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
+        if(order is null)
+        {
+            throw new Exception("OrderUpdate: Order does not exits.");
+        }
+        order.CustomerName = orderChanges.CustomerName ?? order.CustomerName;
+        order.CustomerEmail = orderChanges.CustomerEmail ?? order.CustomerEmail;
+        order.CustomerPhone = orderChanges.CustomerPhone ?? order.CustomerPhone;
+        order.ShippingAddressLine1 = orderChanges.ShippingAddressLine1 ?? order.ShippingAddressLine1;
+        order.ShippingAddressLine2 = orderChanges.ShippingAddressLine2 ?? order.ShippingAddressLine2;
+        order.City = orderChanges.City ?? order.City;
+        order.State = orderChanges.State ?? order.State;
+        order.ZipCode = orderChanges.ZipCode ?? order.ZipCode;
+        order.Country = orderChanges.Country ?? order.Country;
+        order.Status = orderChanges.Status ?? order.Status;
+
+        _context.SaveChanges();
     }
 
-    public void PaymentCreate()
+    public void PaymentCreate(Payment payment)
     {
-        
+        _context.Add(payment);
+        _context.SaveChanges();
     }
 
 
