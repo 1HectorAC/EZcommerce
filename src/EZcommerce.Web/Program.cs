@@ -7,6 +7,8 @@ using EZcommerce.Web.Repositories.Implementations;
 using EZcommerce.Web.Services;
 using EZcommerce.Web.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Stripe;
 
 
 
@@ -16,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("STRIPE"));
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -32,13 +35,18 @@ builder.Services.AddSession(options =>
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ICartService, CartService>();
 
-builder.Services.AddScoped<CheckoutService>();
+builder.Services.AddScoped<EZcommerce.Web.Services.CheckoutService>();
 
 builder.Services.AddDbContext<EZcommerceDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("DB_Connection")));
 builder.Services.AddScoped<IEZcommerceRepository, EZcommerceRepository>();
 builder.Services.AddScoped<IEZcommerceService, EZcommerceService>();
 
 var app = builder.Build();
+
+// Setup global Stripe Api setting, 
+//resolve error when calling ChargeService and not finding secret key
+var stripeOptions = app.Services.GetRequiredService<IOptions<StripeSettings>>();
+StripeConfiguration.ApiKey = stripeOptions.Value.SecretKey;
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -25,15 +25,15 @@ public class CheckoutService
         var sessionItems = cartItems.Select(i => new SessionLineItemOptions
         {
             Quantity = i.Quantity,
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            UnitAmount = (int)(i.PriceSnapshot * 100), // $20
-                            Currency = "usd",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = i.Name
-                            }
-                        }
+            PriceData = new SessionLineItemPriceDataOptions
+            {
+                UnitAmount = (int)(i.PriceSnapshot * 100), // $20
+                Currency = "usd",
+                ProductData = new SessionLineItemPriceDataProductDataOptions
+                {
+                    Name = i.Name
+                }
+            }
         }).ToList();
 
         // Used to get Order in webhook
@@ -43,18 +43,35 @@ public class CheckoutService
         };
 
         var options = new SessionCreateOptions
+        {
+            BillingAddressCollection = "required",
+            ShippingAddressCollection = new SessionShippingAddressCollectionOptions
             {
-                Mode = "payment",
-                SuccessUrl = "http://localhost:5191/Checkout/Success",
-                CancelUrl = "http://localhost:5191/Checkout/Cancel",
-                Metadata = metaData,
-                LineItems = sessionItems
-            };
+                AllowedCountries = new List<string> { "US"},
+            },
+            Mode = "payment",
+            SuccessUrl = "http://localhost:5191/Checkout/Success",
+            CancelUrl = "http://localhost:5191/Checkout/Cancel",
+            Metadata = metaData,
+            LineItems = sessionItems
+        };
 
         Session session = await _client.V1.Checkout.Sessions.CreateAsync(options);
 
         return session;
     }
 
-    
+    public async Task<Charge?> GetChargeAsync(string paymentIntentId)
+    {
+        var chargeService = new ChargeService();
+
+        var charges = await chargeService.ListAsync(new ChargeListOptions
+        {
+            PaymentIntent = paymentIntentId
+        });
+
+        return charges.Data.FirstOrDefault();
+    }
+
+
 }
