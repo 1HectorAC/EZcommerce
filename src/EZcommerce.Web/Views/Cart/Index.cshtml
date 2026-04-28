@@ -7,19 +7,20 @@
 </div>
 <br />
 
-<div class="panelCard1Parent">
-    <div class="panelCard2">
+<div class="flexCenter">
+    <div class="cardType2 whitePanelCard">
         @foreach (CartItem cartItem in Model)
         {
             <div style="display:flex;">
-                <h5 style="display:inline-block; flex-grow:1">@cartItem.Name</h5>
-                <p style="display:inline-block; flex-grow:1">$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
-                <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId>Remove</a>
+                <h5 style="width:33%">@cartItem.Name</h5>
+                <p style="width:33%">$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
+                <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId style="width:33%">Remove</a>
             </div>
         }
-        <hr/>
-        <div style="display:flex; justify-content:center">
-         
+        <hr />
+        <p>Total Amount: $@Model.Sum(i => i.PriceSnapshot)</p>
+        <hr />
+        <div class="flexCenter">
             <button class="btn btn-primary" id="checkoutButton">Checkout</button>
         </div>
     </div>

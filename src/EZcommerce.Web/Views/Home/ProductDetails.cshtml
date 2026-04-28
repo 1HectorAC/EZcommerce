@@ -5,14 +5,12 @@
 </div>
 <br />
 
-<div class="panelCard1Parent">
-    <div class="panelCard1">
-        <div>
-            <div class="pictureBox">
-                <h2>No picture</h2>
-            </div>
+<div class="flexCenter">
+    <div class="cardType1 whitePanelCard">
+        <div class="pictureBox">
+            <h2>No picture</h2>
         </div>
-        <div style="padding:20px">
+        <div style="padding:20px;">
             <h5><u>@Model.Name</u></h5>
             <p>$@Model.Price</p>
             <p>Descriptions: @Model.Description</p>
@@ -24,7 +22,7 @@
                     </button>
                 </div>
                 <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true :
-                                                                                                                                                                                                                                                                                                                                                                false)>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      false)>
                     <button class="btn btn-primary minusQuantity" style="display:inline-block">-</button>
                     <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">
                         @ViewBag.cartItemQuantity

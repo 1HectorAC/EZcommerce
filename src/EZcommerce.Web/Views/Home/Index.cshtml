@@ -19,7 +19,7 @@
 @foreach (Product product in Model)
 {
     <a asp-controller="Home" asp-action="ProductDetails" asp-route-id=@product.Id style="text-decoration:none; color:inherit">
-    <div class="gridItem">
+    <div class="gridItem whitePanelCard">
         <div class="pictureBox"><h2>No picture</h2></div>
         <h5><u>@product.Name</u></h5>
         <p>$@product.Price</p>
