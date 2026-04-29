@@ -53,6 +53,7 @@ public class CheckoutController: Controller
 
 public IActionResult Success()
     {
+        _cartService.ClearCart();
         return View();
     }
 

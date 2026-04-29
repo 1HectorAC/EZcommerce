@@ -58,8 +58,16 @@ public class StripeWebhookcontroller: ControllerBase
                 Console.WriteLine("stripe Session is null error in Webhook");
                 return BadRequest();
             }
-                
-            await HandleCheckoutCompleted(session);
+            try
+            {
+                await HandleCheckoutCompleted(session);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error hit in HandleCheckoutComplete call: " + ex.Message);
+                return BadRequest();
+            }
+            
         }
         else if(stripeEvent.Type == EventTypes.CheckoutSessionExpired)
         {
@@ -88,48 +96,44 @@ public class StripeWebhookcontroller: ControllerBase
 
     public async Task HandleCheckoutCompleted(Session session)
     {
-        
+        Console.WriteLine("Start HandleCheckoutCompleted function");
+
+        // Get charge for pay method and transactionReference
         var charge = await _checkoutService.GetChargeAsync(session.PaymentIntentId);
-                                            
-        
-        /*
-        Console.WriteLine("customer name:" + session.CustomerDetails.Name);
-        Console.WriteLine("Total amount:" + session.AmounTotal);
-        Console.WriteLine("payment type:" + session.PaymentIntent.LatestCharge.PaymentMethodDetails.Type);
-        */
-        /*
+
+        // Get orderId for updating order                  
         var orderIdString = session.Metadata.GetValueOrDefault("orderId");
-        
         if(orderIdString is null)
             throw new Exception("orderId metadata in stripe session not set");
         var orderId = Int32.Parse(orderIdString);
 
-        Console.WriteLine("Start HandleChekcoutCompleted function");
+        
         var order = new Order
         {
             CustomerName = session.CustomerDetails.Name,
             CustomerEmail = session.CustomerDetails.Email,
-            CustomerPhone = session.CustomerDetails.Phone ?? "",
+            CustomerPhone = session.CustomerDetails.Phone,
             ShippingAddressLine1 = session.CollectedInformation.ShippingDetails.Address.Line1,
             ShippingAddressLine2 = session.CollectedInformation.ShippingDetails.Address.Line2,
-            City = session.Customer.CollectedInformation.ShippingDetails.Address.City,
-            State = session.Customer.CollectedInformation.ShippingDetails.Address.State,
-            ZipCode = session.Customer.CollectedInformation.ShippingDetails.Address.PostalCode,
-            Country = session.Customer.CollectedInformation.ShippingDetails.Address.Country,
+            City = session.CollectedInformation.ShippingDetails.Address.City,
+            State = session.CollectedInformation.ShippingDetails.Address.State,
+            ZipCode = session.CollectedInformation.ShippingDetails.Address.PostalCode,
+            Country = session.CollectedInformation.ShippingDetails.Address.Country,
             Status = "Paid"
         };
         _service.OrderUpdate(orderId, order);
         
+        decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m,2);
         var payment = new Payment
         {
             OrderId = orderId,
-            Amount = session.AmountTotal,
+            Amount = amound,
             Method = charge!.PaymentMethod,
             Status = "Paid",
             TransactionReference = charge!.Id
         };
         _service.PaymentCreate(payment);
-    */
+        
         // send email
     }
 }
