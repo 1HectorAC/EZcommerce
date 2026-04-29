@@ -19,4 +19,6 @@ public interface IEZcommerceService
     void OrderUpdate(int orderId, Order orderChanges);
 
     void PaymentCreate(Payment payment);
+
+    Task<List<Product>> ProductGetAllIncludeInventoryAsync();
 }

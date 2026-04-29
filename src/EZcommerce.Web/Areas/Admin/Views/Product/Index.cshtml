@@ -1,0 +1,8 @@
+@using EZcommerce.Web.Models
+@model List<EZcommerce.Web.Models.Product>
+
+<h1>Product Dashboard</h1>
+
+@foreach(Product product in Model){
+    <p>@product.Id @product.Name @product.Price QTY. @product.Inventory!.Quantity</p>
+}

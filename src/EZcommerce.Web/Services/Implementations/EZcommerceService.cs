@@ -150,5 +150,14 @@ public class EZcommerceService : IEZcommerceService
         _context.SaveChanges();
     }
 
+    public async Task<List<Product>> ProductGetAllIncludeInventoryAsync()
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Include(i => i.Inventory)
+            .ToListAsync();
+        return products;
+    }
+
 
 }
