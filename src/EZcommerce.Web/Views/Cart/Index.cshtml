@@ -12,13 +12,28 @@
         @foreach (CartItem cartItem in Model)
         {
             <div style="display:flex;">
-                <h5 style="width:33%">@cartItem.Name</h5>
-                <p style="width:33%">$@cartItem.PriceSnapshot Quantity: @cartItem.Quantity</p>
-                <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId style="width:33%">Remove</a>
+                <h5 style="width:33%">
+                    <a
+                        asp-controller="Home"
+                        asp-action="ProductDetails"
+                        asp-route-id=@cartItem.ProductId
+                        >
+                        @cartItem.Name
+                    </a>
+                    
+                </h5>
+                <p style="width:33%">$@cartItem.PriceSnapshot Qty: @cartItem.Quantity</p>
+                <div style="width:33%">
+                    <span class="material-symbols-outlined">
+                        <a asp-controller="Cart" asp-action="Remove" asp-route-id=@cartItem.ProductId>
+                            delete
+                        </a>
+                    </span>
+                </div>
             </div>
         }
         <hr />
-        <p>Total Amount: $@Model.Sum(i => i.PriceSnapshot)</p>
+        <p>Total Amount: $@Model.Sum(i => i.PriceSnapshot * i.Quantity)</p>
         <hr />
         <div class="flexCenter">
             <button class="btn btn-primary" id="checkoutButton">Checkout</button>

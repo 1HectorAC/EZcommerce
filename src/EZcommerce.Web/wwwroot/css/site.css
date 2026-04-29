@@ -114,3 +114,11 @@ body {
     width:95%;
   }
 }
+
+.shoppingCartSection{
+display:flex; 
+flex-direction:row;
+}
+.shoppingCartSection span{
+  color:#173453;
+}
