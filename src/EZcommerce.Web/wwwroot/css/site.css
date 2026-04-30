@@ -122,3 +122,27 @@ flex-direction:row;
 .shoppingCartSection span{
   color:#173453;
 }
+
+.inStock{
+  background-color:rgb(141, 255, 192);
+  border-radius: 2px;
+  width: 150px;
+  text-align: center;
+  padding:5px;
+  margin-left:5px;
+}
+
+.outStock{
+  background-color:rgb(243, 64, 64);
+  color:white;
+  border-radius: 2px;
+  width: 150px;
+  text-align: center;
+  padding:5px;
+  margin-left:5px;
+}
+
+.customButton1{
+  background-color: rgba(2, 159, 181, 1);
+  border: rgba(2, 159, 181, 1);
+}

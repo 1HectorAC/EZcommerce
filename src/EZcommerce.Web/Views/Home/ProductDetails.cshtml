@@ -11,34 +11,38 @@
             <h2>No picture</h2>
         </div>
         <div style="padding:20px;">
-            <h5><u>@Model.Name</u></h5>
-            <p>$@Model.Price</p>
+            <h3 style="margin-bottom:0px"><u>@Model.Name</u></h3>
+            <p style="padding:0px;margin:0px"><i>Category: @Model.Category</i></p>
+            <h5>$@Model.Price</h5>
             <p>Descriptions: @Model.Description</p>
+            @if (Model.Quantity > 0)
+            {
+                <div class="inStock">In Stock</div>
+            }
+            else
+            {
+                <div class="outStock">Out of Stock</div>
+            }
             <!-- Cart buttons setup -->
-            <div>
+            <div style="display:inline-block">
                 <div class="addCartButton" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? false : true)>
-                    <button class="btn btn-primary ">
+                    <button class="btn btn-primary customButton1">
                         Add to Cart
                     </button>
                 </div>
                 <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      false)>
-                    <button class="btn btn-primary minusQuantity" style="display:inline-block">-</button>
+                                                                                                          false)>
+                    <button class="btn btn-primary minusQuantity customButton1" style="display:inline-block">-</button>
                     <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">
                         @ViewBag.cartItemQuantity
                     </p>
-                    <button class="btn btn-primary addQuantity" style="display:inline-block">+</button>
+                    <button class="btn btn-primary addQuantity customButton1" style="display:inline-block">+</button>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
-
-
 <br />
-
-
 
 @section Scripts {
     <script>
@@ -107,9 +111,6 @@
                 }).catch(error => {
                     console.log("error:" + error);
                 });
-        });
-
-    
-        
+        });      
     </script>
 }

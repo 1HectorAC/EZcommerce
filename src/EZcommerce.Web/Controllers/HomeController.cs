@@ -28,7 +28,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> ProductDetails(int id)
     {
-        var product = await _service.GetProductbyIdAsync(id);
+        var product = await _service.GetProductbyIdWithInventoryAndCategoryAsync(id);
         if(product is null)
         {
             return RedirectToAction("Home", "Index");
@@ -40,7 +40,8 @@ public class HomeController : Controller
             Description = product.Description != null ? product.Description : "",
             Price = product.Price,
             ImageUrl = product.ImageUrl,
-            Category = ""
+            Category = product.Category!.Name,
+            Quantity = product.Inventory!.Quantity
         };
         ViewBag.cartItemQuantity = _cart.GetCartItemQuantity(id);
 

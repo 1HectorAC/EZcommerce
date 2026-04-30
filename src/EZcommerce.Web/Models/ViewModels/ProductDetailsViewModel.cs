@@ -22,6 +22,9 @@ public class ProductDetailsViewModel
     [Required]
     public required string Category {get; set;}
 
+    [Required]
+    public int Quantity {get; set;}
+
     // Maybe add inventory for stock check
 
     
