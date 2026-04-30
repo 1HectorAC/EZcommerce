@@ -150,3 +150,20 @@ flex-direction:row;
   background-color: rgb(119, 212, 225);
   border: rgb(119, 212, 225);
 }
+
+.dashboardPanel{
+  width:200px; 
+  height:100px; 
+  background-color:rgb(213, 231, 246);
+  border-radius: 5px;
+  text-align: center;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  color:#173453;
+}
+.dashboardPanel:hover{
+  background-color:rgb(78, 133, 179);
+  color:white;
+}

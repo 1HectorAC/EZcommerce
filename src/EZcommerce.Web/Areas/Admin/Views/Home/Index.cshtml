@@ -1,2 +1,17 @@
+<div class="headerPanel">
+    <h1>Admin Dashboard</h1>
+</div>
 
-<h1>Admin Index page</h1>
+<div style="display:flex; justify-content:center; margin-top:5px">
+    <a asp-area="Admin" asp-controller="Product" asp-action="Index" style="text-decoration:none">
+        <div class="dashboardPanel">
+            <h5>Products</h5>
+        </div>
+    </a>
+    <div class="dashboardPanel">
+        <h5>Orders</h5>
+    </div>
+    <div class="dashboardPanel">
+        <h5>Payments</h5>
+    </div>
+</div>

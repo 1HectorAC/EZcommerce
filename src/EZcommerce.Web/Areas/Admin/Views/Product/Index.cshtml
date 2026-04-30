@@ -1,8 +1,37 @@
 @using EZcommerce.Web.Models
 @model List<EZcommerce.Web.Models.Product>
 
-<h1>Product Dashboard</h1>
+<div class="headerPanel">
+    <h1>Product Dashboard</h1>
+</div>
 
-@foreach(Product product in Model){
-    <p>@product.Id @product.Name @product.Price QTY. @product.Inventory!.Quantity</p>
-}
+<div style="padding:20px">
+    <table class="table table-sm">
+        <thead class="table-info">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price($)</th>
+                <th scope="col">QTY</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Product product in Model)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>@product.Inventory!.Quantity</td>
+                    <td>Edit | Delete</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<hr />
+<div class="flexCenter">
+    <button class="btn btn-primary customButton1" disabled=true>Add Product</button>
+</div>
+
