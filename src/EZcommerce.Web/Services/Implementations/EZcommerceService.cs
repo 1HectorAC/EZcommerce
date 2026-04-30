@@ -159,5 +159,13 @@ public class EZcommerceService : IEZcommerceService
         return products;
     }
 
+     public async Task<List<Category>> CategoryGetAllAsync()
+    {
+        var categories = await _context.Categories
+            .AsNoTracking().ToListAsync();
+
+        return categories;
+    }
+
 
 }

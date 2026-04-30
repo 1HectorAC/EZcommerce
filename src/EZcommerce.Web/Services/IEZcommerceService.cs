@@ -21,4 +21,6 @@ public interface IEZcommerceService
     void PaymentCreate(Payment payment);
 
     Task<List<Product>> ProductGetAllIncludeInventoryAsync();
+
+    Task<List<Category>> CategoryGetAllAsync();
 }
