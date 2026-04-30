@@ -146,3 +146,7 @@ flex-direction:row;
   background-color: rgba(2, 159, 181, 1);
   border: rgba(2, 159, 181, 1);
 }
+.customButton1:disabled{
+  background-color: rgb(119, 212, 225);
+  border: rgb(119, 212, 225);
+}

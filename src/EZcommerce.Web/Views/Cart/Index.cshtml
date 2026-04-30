@@ -9,6 +9,9 @@
 
 <div class="flexCenter">
     <div class="cardType2 whitePanelCard">
+        @if(Model.Count <= 0){
+            <h5>No items in cart</h5>
+        }
         @foreach (CartItem cartItem in Model)
         {
             <div style="display:flex;">
@@ -36,7 +39,7 @@
         <p>Total Amount: $@Model.Sum(i => i.PriceSnapshot * i.Quantity)</p>
         <hr />
         <div class="flexCenter">
-            <button class="btn btn-primary" id="checkoutButton">Checkout</button>
+            <button class="btn btn-primary customButton1" id="checkoutButton" disabled=@(Model.Count > 0 ? false : true)>Checkout</button>
         </div>
     </div>
 </div>
