@@ -159,13 +159,30 @@ public class EZcommerceService : IEZcommerceService
         return products;
     }
 
-     public async Task<List<Category>> CategoryGetAllAsync()
+    public async Task<List<Category>> CategoryGetAllAsync()
     {
         var categories = await _context.Categories
             .AsNoTracking().ToListAsync();
 
         return categories;
     }
+
+    public async  Task ProductCreateWithInventory(ProductCreateViewModel model)
+    {
+        var product = new Product
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Price = model.Price,
+            ImageUrl = model.ImageUrl,
+            CategoryId = model.CategoryId,
+            Created_at = DateTime.UtcNow,
+            Inventory = new Inventory {Quantity = model.InventoryQuantity}
+        };
+        await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
+    }
+
 
 
 }

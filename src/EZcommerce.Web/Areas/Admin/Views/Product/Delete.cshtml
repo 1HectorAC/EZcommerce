@@ -1,0 +1,12 @@
+@model Product
+<div class="headerPanel">
+    <h1>Delete Product</h1>
+</div>
+
+<p>@Model.Id @Model.Name @Model.Description</p>
+
+<form asp-area="Admin" asp-controller="Product" asp-action="DeleteConfirmed">
+<input type="hidden" asp-for="Id" />
+<button type="submit">Delete</button>
+</form>
+
