@@ -22,7 +22,15 @@ public interface IEZcommerceService
 
     Task<List<Product>> ProductGetAllIncludeInventoryAsync();
 
-    Task<List<Category>> CategoryGetAllAsync();
+    Task<Product?> ProductGetWithInventoryAsync(int id);
 
     Task ProductCreateWithInventory(ProductCreateViewModel model);
+
+    Task ProductEditWithInventory(ProductCreateViewModel model);
+    
+    void ProductRemove(int id);
+    
+    Task<List<Category>> CategoryGetAllAsync();
+
+
 }

@@ -87,9 +87,10 @@ public class EZcommerceService : IEZcommerceService
 
     public async Task LowerInventoriesByCartItems(List<CartItem> items)
     {
-        foreach(var item in items){
+        foreach (var item in items)
+        {
             var inventory = _context.Inventories.FirstOrDefault(i => i.ProductId == item.ProductId);
-            if(inventory == null)
+            if (inventory == null)
                 throw new Exception("Inventory not exits error");
             inventory.Quantity -= item.Quantity;
 
@@ -106,7 +107,7 @@ public class EZcommerceService : IEZcommerceService
             .Include(i => i.Product)
             .ThenInclude(j => j!.Inventory)
             .Where(i => i.OrderId == orderId);
-        foreach(var item in orderItems)
+        foreach (var item in orderItems)
         {
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
@@ -116,7 +117,7 @@ public class EZcommerceService : IEZcommerceService
     public void OrderRemove(int orderId)
     {
         var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
-        if(order is null)
+        if (order is null)
         {
             throw new Exception("OrderRemove: Order does not exits.");
         }
@@ -126,7 +127,7 @@ public class EZcommerceService : IEZcommerceService
     public void OrderUpdate(int orderId, Order orderChanges)
     {
         var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
-        if(order is null)
+        if (order is null)
         {
             throw new Exception("OrderUpdate: Order does not exits.");
         }
@@ -159,15 +160,19 @@ public class EZcommerceService : IEZcommerceService
         return products;
     }
 
-    public async Task<List<Category>> CategoryGetAllAsync()
+    public async Task<Product?> ProductGetWithInventoryAsync(int id)
     {
-        var categories = await _context.Categories
-            .AsNoTracking().ToListAsync();
 
-        return categories;
+        var product = await _context.Products
+            .AsNoTracking()
+            .Include(i => i.Inventory)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return product;
+
     }
 
-    public async  Task ProductCreateWithInventory(ProductCreateViewModel model)
+    public async Task ProductCreateWithInventory(ProductCreateViewModel model)
     {
         var product = new Product
         {
@@ -177,12 +182,47 @@ public class EZcommerceService : IEZcommerceService
             ImageUrl = model.ImageUrl,
             CategoryId = model.CategoryId,
             Created_at = DateTime.UtcNow,
-            Inventory = new Inventory {Quantity = model.InventoryQuantity}
+            Inventory = new Inventory { Quantity = model.InventoryQuantity }
         };
         await _context.Products.AddAsync(product);
         await _context.SaveChangesAsync();
     }
 
+    public async Task ProductEditWithInventory(ProductCreateViewModel model)
+    {
+        var product = _context.Products
+            .Include(i => i.Inventory)
+            .FirstOrDefault(i => i.Id == model.Id);
+        if (product is null || product.Inventory is null)
+            throw new Exception();
 
+        product.Name = model.Name;
+        product.Description = model.Description;
+        product.Price = model.Price;
+        product.ImageUrl = model.ImageUrl;
+        product.CategoryId = model.CategoryId;
+        product.Inventory.Quantity = model.InventoryQuantity;
+
+        await _context.SaveChangesAsync();
+
+    }
+
+    public void ProductRemove(int id)
+    {
+        var product = _context.Products.FirstOrDefault(i => i.Id == id);
+        if (product is null)
+        {
+            throw new Exception();
+        }
+        _context.Remove(product);
+    }
+
+    public async Task<List<Category>> CategoryGetAllAsync()
+    {
+        var categories = await _context.Categories
+            .AsNoTracking().ToListAsync();
+
+        return categories;
+    }
 
 }

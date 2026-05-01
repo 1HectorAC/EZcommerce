@@ -30,7 +30,7 @@ public class ProductController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(ProductCreateViewModel model)
+    public async Task<IActionResult> Create(ProductCreateViewModel model)
     {
         Console.WriteLine("Create function called");
         if (!ModelState.IsValid)
@@ -39,32 +39,35 @@ public class ProductController : Controller
             return View(model);
         }
 
-        Console.WriteLine(model.Price);
-        // Add Product Here
+        await _service.ProductCreateWithInventory(model);
 
         return RedirectToAction("Index");
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-
-        // Get product by id with inventory
-
-        var product = new ProductCreateViewModel
+        var product = await _service.ProductGetWithInventoryAsync(id);
+        if (product is null)
         {
-            Id = 1,
-            Name = "bill",
-            Description = "tissljiojio",
-            Price = 11.11m,
-            ImageUrl = "",
-            CategoryId = 3,
-            InventoryQuantity = 1
+            Console.WriteLine("Product/Edit Error: product was null");
+            return BadRequest();
+        }
+
+        var productModel = new ProductCreateViewModel
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            ImageUrl = product.ImageUrl,
+            CategoryId = product.CategoryId,
+            InventoryQuantity = product.Inventory!.Quantity
         };
 
         var categories = await _service.CategoryGetAllAsync();
         ViewBag.categories = new SelectList(categories, "Id", "Name");
 
-        return View(product);
+        return View(productModel);
     }
 
     [HttpPost]
@@ -74,33 +77,43 @@ public class ProductController : Controller
         {
             return View(product);
         }
-        // edit product
+        try
+        {
+            await _service.ProductEditWithInventory(product);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Product/Edit, Post Error: " + ex.Message);
+        }
 
         return RedirectToAction("Index");
     }
 
     public async Task<IActionResult> Delete(int id)
     {
-        // get product and pass to View
-        var product = new Product
+        var product = await _service.ProductGetWithInventoryAsync(id);
+
+        if (product is null)
         {
-            Id = 1,
-            Name = "11",
-            Description = "adjsfowjfi",
-            Price = 1.11m,
-            CategoryId = 1,
-            Created_at = new DateTime(2025, 1, 1)
-        };
+            Console.WriteLine("Product/Delete, product is null");
+            return BadRequest();
+        }
+
         return View(product);
     }
 
     [HttpPost]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        // Delete the product
-
+        try
+        {
+            _service.ProductRemove(id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Product/DeleteConfirmed Error deleting: " + ex.Message);
+        }
         return RedirectToAction("Index");
     }
-
 
 }

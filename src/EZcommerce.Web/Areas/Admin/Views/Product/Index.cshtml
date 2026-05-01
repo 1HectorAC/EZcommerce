@@ -24,7 +24,15 @@
                     <td>@product.Name</td>
                     <td>@product.Price</td>
                     <td>@product.Inventory!.Quantity</td>
-                    <td>Edit | Delete</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id=@product.Id>
+                            Edit
+                        </a>
+                         |
+                        <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id=@product.Id>
+                            Delete
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
