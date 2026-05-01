@@ -135,11 +135,7 @@ public class EZcommerceService : IEZcommerceService
 
     public void OrderRemove(int orderId)
     {
-        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
-        if (order is null)
-        {
-            throw new Exception("OrderRemove: Order does not exits.");
-        }
+        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId) ?? throw new Exception();
         _context.Orders.Remove(order);
         _context.SaveChanges();
     }
@@ -186,11 +182,6 @@ public class EZcommerceService : IEZcommerceService
         await _context.SaveChangesAsync();
     }
 
-    public void PaymentCreate(Payment payment)
-    {
-        _context.Add(payment);
-        _context.SaveChanges();
-    }
 
     public async Task<List<Product>> ProductGetAllIncludeInventoryAsync()
     {
@@ -203,14 +194,12 @@ public class EZcommerceService : IEZcommerceService
 
     public async Task<Product?> ProductGetWithInventoryAsync(int id)
     {
-
         var product = await _context.Products
             .AsNoTracking()
             .Include(i => i.Inventory)
             .FirstOrDefaultAsync(i => i.Id == id);
 
         return product;
-
     }
 
     public async Task ProductCreateWithInventory(ProductCreateViewModel model)
@@ -250,11 +239,52 @@ public class EZcommerceService : IEZcommerceService
 
     public void ProductRemove(int id)
     {
-        var product = _context.Products.FirstOrDefault(i => i.Id == id);
-        if (product is null)
-        {
-            throw new Exception();
-        }
+        var product = _context.Products.FirstOrDefault(i => i.Id == id) ?? throw new Exception();
+        _context.Remove(product);
+        _context.SaveChanges();
+    }
+
+    public async Task<List<Payment>> PaymentGetAllAsync()
+    {
+        var payments = await _context.Payments
+            .AsNoTracking()
+            .ToListAsync();
+        return payments;
+    }
+
+    public async Task<Payment?> PaymentGetByIdAsync(int id)
+    {
+        var payment = await _context.Payments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return payment;
+    }
+
+    public async Task PaymentEditAsync(Payment payment)
+    {
+        var oldPayment = _context.Payments
+            .FirstOrDefault(i => i.Id == payment.Id) ?? throw new Exception();
+        oldPayment.OrderId = payment.OrderId;
+        oldPayment.Amount = payment.Amount;
+        oldPayment.Method = payment.Method;
+        oldPayment.Status = payment.Status;
+        oldPayment.TransactionReference = payment.TransactionReference;
+
+
+        await _context.SaveChangesAsync();
+    }
+
+
+    public void PaymentCreate(Payment payment)
+    {
+        _context.Add(payment);
+        _context.SaveChanges();
+    }
+
+    public void PaymentRemove(int id)
+    {
+        var product = _context.Products.FirstOrDefault(i => i.Id == id) ?? throw new Exception();
         _context.Remove(product);
         _context.SaveChanges();
     }

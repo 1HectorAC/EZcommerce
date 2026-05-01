@@ -25,8 +25,7 @@ public interface IEZcommerceService
 
     Task OrderUpdateAsync(OrderViewModel model);
 
-    void PaymentCreate(Payment payment);
-
+    
     Task<List<Product>> ProductGetAllIncludeInventoryAsync();
 
     Task<Product?> ProductGetWithInventoryAsync(int id);
@@ -37,6 +36,16 @@ public interface IEZcommerceService
     
     void ProductRemove(int id);
 
+    Task<List<Payment>> PaymentGetAllAsync();
+
+    Task<Payment?> PaymentGetByIdAsync(int id);
+
+    Task PaymentEditAsync(Payment payment);
+
+    void PaymentCreate(Payment payment);
+
+    void PaymentRemove(int id);
+   
     Task<List<Category>> CategoryGetAllAsync();
 
 

@@ -1,0 +1,11 @@
+@model Payment
+<div class="headerPanel">
+    <h1>Delete Payment</h1>
+</div>
+
+<p>@Model.Id @Model.OrderId @Model.Amount</p>
+
+<form asp-area="Admin" asp-controller="Payment" asp-action="DeleteConfirmed">
+<input type="hidden" asp-for="Id" />
+<button type="submit">Delete</button>
+</form>
