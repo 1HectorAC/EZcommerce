@@ -1,0 +1,46 @@
+
+@using EZcommerce.Web.Models
+@model List<EZcommerce.Web.Models.Order>
+
+<div class="headerPanel">
+    <h1>Order Dashboard</h1>
+</div>
+
+<div style="padding:20px">
+    <table class="table table-sm">
+        <thead class="table-info">
+            <tr>
+                <th scope="col">CustomerName</th>
+                <th scope="col">CustomerEmail</th>
+                <th scope="col">Address</th>
+                <th scope="col">TotalAmount</th>
+                <th scope="col">Address</th>
+                <th scope="col">Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Order order in Model)
+            {
+                <tr>
+                    <td>@order.CustomerName</td>
+                    <td>@order.CustomerEmail</td>
+                    <td>@order.ShippingAddressLine1 @order.ShippingAddressLine2 @order.City @order.State @order.ZipCode @order.Country</td>
+                    <td>@order.TotalAmmount</td>
+                    <td>@order.Status</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Edit" asp-route-id=@order.Id>
+                            Edit
+                        </a>
+                         |
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Delete" asp-route-id=@order.Id>
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

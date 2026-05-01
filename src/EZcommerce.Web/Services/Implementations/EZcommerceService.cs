@@ -1,6 +1,7 @@
 using EZcommerce.Web.Data;
 using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
+using EZcommerce.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace EZcommerce.Web.Services.Implementations;
@@ -98,6 +99,23 @@ public class EZcommerceService : IEZcommerceService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<List<Order>> OrderGetAllAsync()
+    {
+        var orders = await _context.Orders
+            .AsNoTracking()
+            .ToListAsync();
+        return orders;
+    }
+
+    public async Task<Order?> OrderGetByIdAsync(int id)
+    {
+        var order = await _context.Orders
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return order;
+    }
+
     public async Task OrderInventoryRollback(int orderId)
     {
         var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
@@ -112,6 +130,7 @@ public class EZcommerceService : IEZcommerceService
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
         _context.Orders.Remove(order);
+        _context.SaveChanges();
     }
 
     public void OrderRemove(int orderId)
@@ -122,6 +141,7 @@ public class EZcommerceService : IEZcommerceService
             throw new Exception("OrderRemove: Order does not exits.");
         }
         _context.Orders.Remove(order);
+        _context.SaveChanges();
     }
 
     public void OrderUpdate(int orderId, Order orderChanges)
@@ -143,6 +163,27 @@ public class EZcommerceService : IEZcommerceService
         order.Status = orderChanges.Status ?? order.Status;
 
         _context.SaveChanges();
+    }
+
+    public async Task OrderUpdateAsync(OrderViewModel model)
+    {
+        var order = _context.Orders
+            .FirstOrDefault(i => i.Id == model.Id);
+        if (order is null)
+            throw new Exception();
+
+        order.CustomerName = model.CustomerName;
+        order.CustomerEmail = model.CustomerEmail;
+        order.CustomerPhone = model.CustomerPhone;
+        order.ShippingAddressLine1 = model.ShippingAddressLine1;
+        order.ShippingAddressLine2 = model.ShippingAddressLine2;
+        order.City = model.City;
+        order.State = model.State;
+        order.ZipCode = model.ZipCode;
+        order.Country = model.Country;
+        order.Status = model.Status;
+
+        await _context.SaveChangesAsync();
     }
 
     public void PaymentCreate(Payment payment)
@@ -215,6 +256,7 @@ public class EZcommerceService : IEZcommerceService
             throw new Exception();
         }
         _context.Remove(product);
+        _context.SaveChanges();
     }
 
     public async Task<List<Category>> CategoryGetAllAsync()

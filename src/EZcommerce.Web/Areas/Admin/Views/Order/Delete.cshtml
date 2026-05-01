@@ -1,0 +1,11 @@
+@model Order
+<div class="headerPanel">
+    <h1>Delete Product</h1>
+</div>
+
+<p>@Model.Id @Model.CustomerEmail @Model.TotalAmmount</p>
+
+<form asp-area="Admin" asp-controller="Order" asp-action="DeleteConfirmed">
+<input type="hidden" asp-for="Id" />
+<button type="submit">Delete</button>
+</form>

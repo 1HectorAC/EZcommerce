@@ -1,0 +1,54 @@
+@using EZcommerce.Web.Models.ViewModels
+@model OrderViewModel
+<div class="headerPanel">
+    <h1>Edit Order</h1>
+</div>
+
+<form asp-area="Admin" asp-controller="Order" asp-action="Edit" method="POST">
+    <input type="hidden" asp-for="Id" />
+    <label asp-for="CustomerName"></label>
+    <input asp-for="CustomerName" class="form-control" />
+    <span asp-validation-for="CustomerName" class="text-danger"></span>
+
+    <label asp-for="CustomerEmail"></label>
+    <input asp-for="CustomerEmail" class="form-control" />
+    <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+
+    <label asp-for="CustomerPhone"></label>
+    <input asp-for="CustomerPhone" class="form-control" />
+    <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+
+    <label asp-for="ShippingAddressLine1"></label>
+    <input asp-for="ShippingAddressLine1" class="form-control" />
+    <span asp-validation-for="ShippingAddressLine1" class="text-danger"></span>
+
+    <label asp-for="ShippingAddressLine2"></label>
+    <input asp-for="ShippingAddressLine2" class="form-control" />
+    <span asp-validation-for="ShippingAddressLine2" class="text-danger"></span>
+
+    <label asp-for="City"></label>
+    <input asp-for="City" class="form-control" />
+    <span asp-validation-for="City" class="text-danger"></span>
+
+    <label asp-for="State"></label>
+    <input asp-for="State" class="form-control" />
+    <span asp-validation-for="State" class="text-danger"></span>
+
+    <label asp-for="ZipCode"></label>
+    <input asp-for="ZipCode" class="form-control" />
+    <span asp-validation-for="ZipCode" class="text-danger"></span>
+
+    <label asp-for="Country"></label>
+    <input asp-for="Country" class="form-control" />
+    <span asp-validation-for="Country" class="text-danger"></span>
+
+    <label asp-for="TotalAmmount"></label>
+    <input asp-for="TotalAmmount" type="number" step="0.01" class="form-control" />
+    <span asp-validation-for="TotalAmmount" class="text-danger"></span>
+
+    <label asp-for="Status"></label>
+    <input asp-for="Status" class="form-control" />
+    <span asp-validation-for="Status" class="text-danger"></span>
+
+    <button type="submit">Submit</button>
+</form>
