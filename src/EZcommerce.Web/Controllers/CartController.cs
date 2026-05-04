@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EZcommerce.Web.Controllers;
 
-public class CartController: Controller
+public class CartController : Controller
 {
     private readonly ICartService _cart;
     public CartController(ICartService cart)
@@ -18,23 +18,18 @@ public class CartController: Controller
         var cart = _cart.GetCart();
         return View(cart);
     }
-    public IActionResult Add(CartItem cartItem)
-    {
-
-        _cart.AddToCart(cartItem);
-        return RedirectToAction("Index");
-    }
 
     [HttpPost]
-    public IActionResult Add2([FromBody] CartItem cartItem)
+    public IActionResult Add([FromBody] CartItem cartItem)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest("Inputed data was not properly formated");
         }
-        Console.WriteLine($"productId: {cartItem.ProductId} name; {cartItem.Name}");
         _cart.AddToCart(cartItem);
-        
+
+        //var cartItemQuantity = _cart.GetCartItemQuantity(cartItem.ProductId);
+
         //consider returning quantity
         return Ok(1);
     }
@@ -42,7 +37,6 @@ public class CartController: Controller
     [HttpGet("[controller]/LowerQuantity/{productId}")]
     public IActionResult LowerQuantity([FromRoute] int productId)
     {
-        Console.WriteLine("CartController productId: " + productId);
         _cart.DecrementCartItemQuantity(productId);
 
         //consider returning quantity
@@ -55,13 +49,7 @@ public class CartController: Controller
         return RedirectToAction("Index");
     }
 
-    [HttpGet]
-    public IActionResult GetCartCount()
-    {
-        int totalCount = _cart.GetCount();
-        return Ok(totalCount);
-    }
-
+    // Used in navbar for initial cart total display
     [HttpGet]
     public IActionResult GetInventoryCount()
     {
