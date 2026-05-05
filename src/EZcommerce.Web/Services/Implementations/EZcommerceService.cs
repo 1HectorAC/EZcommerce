@@ -129,7 +129,6 @@ public class EZcommerceService : IEZcommerceService
         {
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
-        _context.Orders.Remove(order);
         _context.SaveChanges();
     }
 

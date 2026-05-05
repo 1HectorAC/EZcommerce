@@ -49,6 +49,7 @@ public class CheckoutService
             {
                 AllowedCountries = new List<string> { "US"},
             },
+            ExpiresAt = DateTime.UtcNow.AddMinutes(30),
             Mode = "payment",
             SuccessUrl = "http://localhost:5191/Checkout/Success",
             CancelUrl = "http://localhost:5191/Checkout/Cancel",

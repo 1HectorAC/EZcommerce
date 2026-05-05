@@ -12,7 +12,7 @@ namespace EZcommerce.Web.Webhooks;
 
 [ApiController]
 [Route("webhooks/stripe")]
-public class StripeWebhookcontroller: ControllerBase
+public class StripeWebhookcontroller : ControllerBase
 {
 
     private readonly StripeSettings _stripeSettings;
@@ -43,17 +43,18 @@ public class StripeWebhookcontroller: ControllerBase
                 _stripeSettings.WebhookSecret
             );
         }
-        catch(Exception ex){ 
+        catch (Exception ex)
+        {
             Console.WriteLine($"Webhook signiture verification failed. {ex.Message}");
             return BadRequest();
-            }
+        }
 
         // Handle event
-        if(stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
+        if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
         {
             Console.WriteLine("2) CheckoutSessionCompleted event received ");
             var session = stripeEvent.Data.Object as Session;
-            if(session is null)
+            if (session is null)
             {
                 Console.WriteLine("stripe Session is null error in Webhook");
                 return BadRequest();
@@ -62,32 +63,38 @@ public class StripeWebhookcontroller: ControllerBase
             {
                 await HandleCheckoutCompleted(session);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Error hit in HandleCheckoutComplete call: " + ex.Message);
                 return BadRequest();
             }
-            
+
         }
-        else if(stripeEvent.Type == EventTypes.CheckoutSessionExpired)
+        else if (stripeEvent.Type == EventTypes.CheckoutSessionExpired)
         {
             Console.WriteLine("2) CheckoutSessionExpired received");
             var session = stripeEvent.Data.Object as Session;
-            if(session is null)
+            if (session is null)
             {
                 Console.WriteLine("stripe Session is null error in Webhook");
                 return BadRequest();
             }
             var orderIdString = session.Metadata.GetValueOrDefault("orderId");
-            if(orderIdString is null)
+            if (orderIdString is null)
                 return BadRequest("orderId metadata in stripe session not set");
 
             var orderId = Int32.Parse(orderIdString);
 
-            await _service.OrderInventoryRollback(orderId);
-
-            _service.OrderRemove(orderId);
-            
+            try
+            {
+                await _service.OrderInventoryRollback(orderId);
+                _service.OrderRemove(orderId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error handling CheckoutSessionExpired: " + ex.Message);
+                return BadRequest();
+            }
         }
 
         Console.WriteLine("3) Finished Stripe webhook call.");
@@ -103,11 +110,11 @@ public class StripeWebhookcontroller: ControllerBase
 
         // Get orderId for updating order                  
         var orderIdString = session.Metadata.GetValueOrDefault("orderId");
-        if(orderIdString is null)
+        if (orderIdString is null)
             throw new Exception("orderId metadata in stripe session not set");
         var orderId = Int32.Parse(orderIdString);
 
-        
+
         var order = new Order
         {
             CustomerName = session.CustomerDetails.Name,
@@ -122,8 +129,8 @@ public class StripeWebhookcontroller: ControllerBase
             Status = "Paid"
         };
         _service.OrderUpdate(orderId, order);
-        
-        decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m,2);
+
+        decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m, 2);
         var payment = new Payment
         {
             OrderId = orderId,
@@ -133,7 +140,7 @@ public class StripeWebhookcontroller: ControllerBase
             TransactionReference = charge!.Id
         };
         _service.PaymentCreate(payment);
-        
+
         // send email
     }
 }
