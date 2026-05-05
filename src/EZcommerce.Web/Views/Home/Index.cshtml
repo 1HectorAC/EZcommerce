@@ -3,11 +3,10 @@
     ViewData["Title"] = "Home Page";
 }
 
-
 <div class="headerPanel">
     <div>
         <h1>EZcommerce</h1>
-        <p><i>Where commerce is easy, you buy easy... or something like that.</i></p>
+        <p><i>When commerce is easy, you buy easy... or something like that.</i></p>
     </div>
 
 </div>
@@ -16,16 +15,17 @@
 <hr />
 
 <div class="gridParent">
-@foreach (Product product in Model)
-{
-    <a asp-controller="Home" asp-action="ProductDetails" asp-route-id=@product.Id style="text-decoration:none; color:inherit">
-    <div class="gridItem whitePanelCard">
-        <div class="pictureBox"><h2>No picture</h2></div>
-        <h5><u>@product.Name</u></h5>
-        <p>$@product.Price</p>
-        
-
-    </div>
-    </a>
-}
+    @foreach (Product product in Model)
+    {
+        <a asp-controller="Home" asp-action="ProductDetails" asp-route-id=@product.Id
+               style="text-decoration:none; color:inherit">
+            <div class="gridItem whitePanelCard">
+                <div class="pictureBox">
+                    <h2>No picture</h2>
+                </div>
+                <h5><u>@product.Name</u></h5>
+                <p>$@product.Price</p>
+            </div>
+        </a>
+    }
 </div>
