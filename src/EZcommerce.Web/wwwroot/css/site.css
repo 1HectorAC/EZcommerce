@@ -73,6 +73,12 @@ body {
   padding: 20px;
 }
 
+@media (max-width: 768px) {
+  .gridParent{
+    grid-template-columns: auto;
+  }
+}
+
 .gridItem {
   text-decoration: none;
   align-items: center;
@@ -180,4 +186,11 @@ flex-direction:row;
 .dashboardPanel:hover{
   background-color:rgb(78, 133, 179);
   color:white;
+}
+
+.subText1{
+  padding:0px;
+  margin:0px;
+  color:#566d86;
+  font-style: italic;
 }

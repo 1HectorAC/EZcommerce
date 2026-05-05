@@ -7,12 +7,15 @@
 
 <div class="flexCenter">
     <div class="cardType1 whitePanelCard">
-        <div class="pictureBox">
-            <h2>No picture</h2>
+        <div>
+            <div class="pictureBox">
+                <h2>No picture</h2>
+            </div>
         </div>
+        
         <div style="padding:20px;">
             <h3 style="margin-bottom:0px"><u>@Model.Name</u></h3>
-            <p style="padding:0px;margin:0px"><i>Category: @Model.Category</i></p>
+            <p class="subText1">Category: @Model.Category</p>
             <h5>$@Model.Price</h5>
             <p>Descriptions: @Model.Description</p>
             @if (Model.Quantity > 0)
@@ -31,7 +34,7 @@
                     </button>
                 </div>
                 <div class="quantityChanger" style="padding: 5px" hidden=@(ViewBag.cartItemQuantity == 0 ? true :
-                                                                                                                                                                                                false)>
+                                                                                                                                                                                                                                                                                      false)>
                     <button class="btn btn-primary minusQuantity customButton1" style="display:inline-block">-</button>
                     <p class="quantityText" style="display:inline-block; margin:0px 10px 0px 10px">
                         @ViewBag.cartItemQuantity
