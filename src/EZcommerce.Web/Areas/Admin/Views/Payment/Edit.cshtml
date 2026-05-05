@@ -1,29 +1,35 @@
 @model Payment
-<div class="headerPanel">
+<div class="headerPanel2">
     <h1>Edit Payment</h1>
 </div>
+<br />
+<div class="flexCenter">
+    <div class="whitePanelCard cardType2">
+        <form asp-area="Admin" asp-controller="Payment" asp-action="Edit" method="POST">
+            <input type="hidden" asp-for="Id" />
+            <label asp-for="OrderId"></label>
+            <input asp-for="OrderId" class="form-control" />
+            <span asp-validation-for="OrderId" class="text-danger"></span>
 
-<form asp-area="Admin" asp-controller="Payment" asp-action="Edit" method="POST">
-    <input type="hidden" asp-for="Id" />
-    <label asp-for="OrderId"></label>
-    <input asp-for="OrderId" class="form-control" />
-    <span asp-validation-for="OrderId" class="text-danger"></span>
+            <label asp-for="Amount"></label>
+            <input asp-for="Amount" type="number" step="0.01" class="form-control" />
+            <span asp-validation-for="Amount" class="text-danger"></span>
 
-    <label asp-for="Amount"></label>
-    <input asp-for="Amount" type="number" step="0.01" class="form-control" />
-    <span asp-validation-for="Amount" class="text-danger"></span>
+            <label asp-for="Method"></label>
+            <input asp-for="Method" class="form-control" />
+            <span asp-validation-for="Method" class="text-danger"></span>
 
-    <label asp-for="Method"></label>
-    <input asp-for="Method" class="form-control" />
-    <span asp-validation-for="Method" class="text-danger"></span>
+            <label asp-for="Status"></label>
+            <input asp-for="Status" class="form-control" />
+            <span asp-validation-for="Status" class="text-danger"></span>
 
-    <label asp-for="Status"></label>
-    <input asp-for="Status" class="form-control" />
-    <span asp-validation-for="Status" class="text-danger"></span>
+            <label asp-for="TransactionReference"></label>
+            <input asp-for="TransactionReference" class="form-control" />
+            <span asp-validation-for="TransactionReference" class="text-danger"></span>
 
-    <label asp-for="TransactionReference"></label>
-    <input asp-for="TransactionReference" class="form-control" />
-    <span asp-validation-for="TransactionReference" class="text-danger"></span>
+            <br/>
+            <button class="btn btn-primary customButton1" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
 
-    <button type="submit">Submit</button>
-</form>

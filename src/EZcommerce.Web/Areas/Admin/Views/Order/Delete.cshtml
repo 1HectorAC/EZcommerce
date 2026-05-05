@@ -1,11 +1,21 @@
 @model Order
-<div class="headerPanel">
+<div class="headerPanel2">
     <h1>Delete Order</h1>
 </div>
+<br />
+<div class="flexCenter">
+    <div class="whitePanelCard cardType2">
+        <h5>Id: <b>@Model.Id</b></h5>
+        <h5>CustomerName: <b>@Model.CustomerName</b></h5>
+        <h5>CustomerEmail: <b>@Model.CustomerEmail</b></h5>
+        <h5>CustomerPhone: <b>@Model.CustomerPhone</b></h5>
+        <h5>Address: <b>@Model.ShippingAddressLine1 @Model.ShippingAddressLine2 @Model.City @Model.State @Model.ZipCode @Model.Country</b> </h5>
+        <h5>TotalAmount: <b>@Model.TotalAmmount</b></h5>
+        <h5>Status: <b>@Model.Status</b></h5>
 
-<p>@Model.Id @Model.CustomerEmail @Model.TotalAmmount</p>
-
-<form asp-area="Admin" asp-controller="Order" asp-action="DeleteConfirmed">
-<input type="hidden" asp-for="Id" />
-<button type="submit">Delete</button>
-</form>
+        <form asp-area="Admin" asp-controller="Order" asp-action="DeleteConfirmed">
+            <input type="hidden" asp-for="Id" />
+            <button class="btn btn-primary customButton1" type="submit">Delete</button>
+        </form>
+    </div>
+</div>

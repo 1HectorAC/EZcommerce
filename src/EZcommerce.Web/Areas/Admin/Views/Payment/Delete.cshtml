@@ -1,11 +1,19 @@
 @model Payment
-<div class="headerPanel">
+<div class="headerPanel2">
     <h1>Delete Payment</h1>
 </div>
-
-<p>@Model.Id @Model.OrderId @Model.Amount</p>
-
-<form asp-area="Admin" asp-controller="Payment" asp-action="DeleteConfirmed">
-<input type="hidden" asp-for="Id" />
-<button type="submit">Delete</button>
-</form>
+<br />
+<div class="flexCenter">
+    <div class="whitePanelCard cardType2">
+        <h5>Id: <b>@Model.Id</b></h5>
+        <h5>OrderId: <b>@Model.OrderId</b></h5>
+        <h5>Amount: <b>@Model.Amount</b></h5>
+        <h5>Method: <b>@Model.Method</b></h5>
+        <h5>Status: <b>@Model.Status</b></h5>
+        <h5>Transfer Reference: <b>@Model.TransactionReference</b></h5>
+        <form asp-area="Admin" asp-controller="Payment" asp-action="DeleteConfirmed">
+            <input type="hidden" asp-for="Id" />
+            <button class="btn btn-primary customButton1" type="submit">Delete</button>
+        </form>
+    </div>
+</div>
