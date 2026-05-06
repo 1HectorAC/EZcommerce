@@ -4,6 +4,9 @@
 <div class="headerPanel2">
     <h1>Product Dashboard</h1>
 </div>
+<div style="padding-top: 5px; padding-left: 10px">
+    <a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Dashboard</a> | Products
+</div>
 
 <div style="padding:20px">
     <table class="table table-sm">
@@ -28,7 +31,7 @@
                         <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id=@product.Id>
                             Edit
                         </a>
-                         |
+                        |
                         <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id=@product.Id>
                             Delete
                         </a>
@@ -41,7 +44,7 @@
 <hr />
 <div class="flexCenter">
     <a asp-area="admin" asp-controller="Product" asp-action="Create">
-    <button class="btn btn-primary customButton1">Add Product</button>
+        <button class="btn btn-primary customButton1">Add Product</button>
     </a>
 </div>
 
