@@ -2,6 +2,7 @@ using EZcommerce.Web.Data;
 using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Models.ViewModels;
+using EZcommerce.Web.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 namespace EZcommerce.Web.Services.Implementations;
@@ -11,41 +12,41 @@ public class EZcommerceService : IEZcommerceService
 
     // Change to use EZcommerce repo later
     private readonly EZcommerceDbContext _context;
-    public EZcommerceService(EZcommerceDbContext context)
+
+    private readonly EZcommerceRepository _repo;
+    public EZcommerceService(EZcommerceDbContext context, EZcommerceRepository repo)
     {
         _context = context;
+        _repo = repo;
     }
 
 
     // maybe put validations in OrderValidation class
-    public void ValidateCart(List<CartItem> items)
+    public async Task ValidateCart(List<CartItem> items)
     {
         foreach (var item in items)
         {
-            ValidateProductExists(item);
-            ValidatePrice(item);
-            ValidateInventory(item);
+            await ValidateProductExists(item);
+            await ValidatePrice(item);
+            await ValidateInventory(item);
         }
     }
-    private void ValidateProductExists(CartItem item)
+    private async Task ValidateProductExists(CartItem item)
     {
-        if (!_context.Products.Any(p => p.Id == item.ProductId))
+        if (!await _repo.ProductAnyAsync(item.ProductId))
             throw new Exception("Product does not exits");
     }
 
-    private void ValidatePrice(CartItem item)
+    private async Task ValidatePrice(CartItem item)
     {
-        var product = _context.Products
-            .FirstOrDefault(i => i.Id == item.ProductId);
+        var product = await _repo.ProductGetByIdAsync(item.ProductId);
 
         if (product!.Price != item.PriceSnapshot)
             throw new Exception("Price mismatch");
     }
-    private void ValidateInventory(CartItem item)
+    private async Task ValidateInventory(CartItem item)
     {
-        var product = _context.Products
-            .Include(i => i.Inventory)
-            .FirstOrDefault(i => i.Id == item.ProductId);
+        var product = await _repo.ProductGetByIdWithInventoryAsync(item.ProductId);
 
         if (product!.Inventory!.Quantity < item.Quantity)
             throw new Exception("Not enough Inventory");
@@ -81,8 +82,8 @@ public class EZcommerceService : IEZcommerceService
             CreatedAt = DateTime.UtcNow,
             OrderItems = orderItems
         };
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
+        await _repo.OrderAddAndSaveAsync(order);
+        
         return order.Id;
     }
 
@@ -90,7 +91,7 @@ public class EZcommerceService : IEZcommerceService
     {
         foreach (var item in items)
         {
-            var inventory = _context.Inventories.FirstOrDefault(i => i.ProductId == item.ProductId);
+            var inventory = await _repo.InventoryGetByProductIdAsync(item.ProductId);
             if (inventory == null)
                 throw new Exception("Inventory not exits error");
             inventory.Quantity -= item.Quantity;
@@ -101,30 +102,23 @@ public class EZcommerceService : IEZcommerceService
 
     public async Task<List<Order>> OrderGetAllAsync()
     {
-        var orders = await _context.Orders
-            .AsNoTracking()
-            .ToListAsync();
+        var orders = await _repo.OrderGetAllAsync();
         return orders;
     }
 
     public async Task<Order?> OrderGetByIdAsync(int id)
     {
-        var order = await _context.Orders
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == id);
-
+        var order = await _repo.OrderGetByIdAsync(id);
         return order;
     }
 
     public async Task OrderInventoryRollback(int orderId)
     {
-        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
-        if (order is null)
+        if (!await _repo.OrderAnyAsync(orderId))
             throw new Exception("Order not exits in OrderInventoryRollback function");
-        var orderItems = _context.OrderItems
-            .Include(i => i.Product)
-            .ThenInclude(j => j!.Inventory)
-            .Where(i => i.OrderId == orderId);
+        
+        var orderItems = await _repo.OrderItemGetByOrderIdWithProductAndInventoryAsync(orderId);
+
         foreach (var item in orderItems)
         {
             item.Product!.Inventory!.Quantity += item.Quantity;
@@ -132,11 +126,10 @@ public class EZcommerceService : IEZcommerceService
         _context.SaveChanges();
     }
 
-    public void OrderRemove(int orderId)
+    public async Task OrderRemove(int orderId)
     {
-        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId) ?? throw new Exception();
-        _context.Orders.Remove(order);
-        _context.SaveChanges();
+        var order = await _repo.OrderGetByIdNoTrackingAsync(orderId) ?? throw new Exception();
+        await _repo.OrderRemoveAndSaveAsync(order);
     }
 
     public void OrderUpdate(Order orderChanges)

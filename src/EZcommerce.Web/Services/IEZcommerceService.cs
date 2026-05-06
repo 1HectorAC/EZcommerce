@@ -9,7 +9,7 @@ public interface IEZcommerceService
 {
     // Consider Seperating Product/Order/Payment into seperate services
 
-    void ValidateCart(List<CartItem> items);
+    Task ValidateCart(List<CartItem> items);
 
     Task<int> InitiateOrderFromCartItems(List<CartItem> items);
 
@@ -26,7 +26,7 @@ public interface IEZcommerceService
     Task<List<Order>> OrderGetAllAsync();
     Task<Order?> OrderGetByIdAsync(int id);
     Task OrderInventoryRollback(int orderId);
-    void OrderRemove(int orderId);
+    Task OrderRemove(int orderId);
     void OrderUpdate(Order orderChanges);
     Task OrderUpdateAsync(OrderViewModel model);
 

@@ -30,7 +30,7 @@ public class CheckoutController: Controller
             return BadRequest("No Items in Cart Found.");
         try
         {
-           _service.ValidateCart(cartItems) ;
+           await _service.ValidateCart(cartItems) ;
         }catch(Exception ex)
         {
             // Maybe just remove invalid cart items instead of clearing
