@@ -139,9 +139,9 @@ public class EZcommerceService : IEZcommerceService
         _context.SaveChanges();
     }
 
-    public void OrderUpdate(int orderId, Order orderChanges)
+    public void OrderUpdate(Order orderChanges)
     {
-        var order = _context.Orders.FirstOrDefault(i => i.Id == orderId);
+        var order = _context.Orders.FirstOrDefault(i => i.Id == orderChanges.Id);
         if (order is null)
         {
             throw new Exception("OrderUpdate: Order does not exits.");
@@ -181,6 +181,12 @@ public class EZcommerceService : IEZcommerceService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<List<Product>> GetProductsAsync()
+    {
+        return await _context.Products
+        .AsNoTracking()
+        .ToListAsync();
+    }
 
     public async Task<List<Product>> ProductGetAllIncludeInventoryAsync()
     {
@@ -199,6 +205,15 @@ public class EZcommerceService : IEZcommerceService
             .FirstOrDefaultAsync(i => i.Id == id);
 
         return product;
+    }
+
+        public async Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id)
+    {
+        return await _context.Products
+        .AsNoTracking()
+        .Include(i => i.Inventory)
+        .Include(i => i.Category)
+        .FirstOrDefaultAsync(i => i.Id == id);
     }
 
     public async Task ProductCreateWithInventory(ProductCreateViewModel model)

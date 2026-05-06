@@ -7,45 +7,35 @@ namespace EZcommerce.Web.Services;
 
 public interface IEZcommerceService
 {
+    // Consider Seperating Product/Order/Payment into seperate services
+
     void ValidateCart(List<CartItem> items);
 
     Task<int> InitiateOrderFromCartItems(List<CartItem> items);
 
     Task LowerInventoriesByCartItems(List<CartItem> items);
 
-    Task<List<Order>> OrderGetAllAsync();
-
-    Task<Order?> OrderGetByIdAsync(int id);
-
-    Task OrderInventoryRollback(int orderId);
-
-    void OrderRemove(int orderId);
-
-    void OrderUpdate(int orderId, Order orderChanges);
-
-    Task OrderUpdateAsync(OrderViewModel model);
-
-    
+    Task<List<Product>> GetProductsAsync();
     Task<List<Product>> ProductGetAllIncludeInventoryAsync();
-
     Task<Product?> ProductGetWithInventoryAsync(int id);
-
+    Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id);
     Task ProductCreateWithInventory(ProductCreateViewModel model);
-
     Task ProductEditWithInventory(ProductCreateViewModel model);
-    
     void ProductRemove(int id);
 
+    Task<List<Order>> OrderGetAllAsync();
+    Task<Order?> OrderGetByIdAsync(int id);
+    Task OrderInventoryRollback(int orderId);
+    void OrderRemove(int orderId);
+    void OrderUpdate(Order orderChanges);
+    Task OrderUpdateAsync(OrderViewModel model);
+
     Task<List<Payment>> PaymentGetAllAsync();
-
     Task<Payment?> PaymentGetByIdAsync(int id);
-
     Task PaymentEditAsync(Payment payment);
-
     void PaymentCreate(Payment payment);
-
     void PaymentRemove(int id);
-   
+
     Task<List<Category>> CategoryGetAllAsync();
 
 

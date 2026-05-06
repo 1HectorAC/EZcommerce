@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using EZcommerce.Web.Models;
-using EZcommerce.Web.Data;
-using EZcommerce.Web.Repositories;
 using EZcommerce.Web.Models.ViewModels;
 using EZcommerce.Web.Services;
 
@@ -10,14 +8,13 @@ namespace EZcommerce.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IEZcommerceRepository _service;
+    private readonly IEZcommerceService _service;
     private readonly ICartService _cart;
 
-    public HomeController(IEZcommerceRepository service, ICartService cart)
+    public HomeController(IEZcommerceService service, ICartService cart)
     {
         _service = service;
         _cart = cart;
-
     }
 
     public async Task<IActionResult> Index()
@@ -28,7 +25,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> ProductDetails(int id)
     {
-        var product = await _service.GetProductbyIdWithInventoryAndCategoryAsync(id);
+        var product = await _service.ProductGetbyIdWithInventoryAndCategoryAsync(id);
         if(product is null)
         {
             return RedirectToAction("Home", "Index");

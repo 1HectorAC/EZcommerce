@@ -12,27 +12,6 @@ public class EZcommerceRepository: IEZcommerceRepository
     {
         _context = context;
     }
-    public async Task<List<Product>> GetProductsAsync()
-    {
-        return await _context.Products
-        .AsNoTracking()
-        .ToListAsync();
-    }
 
-    public async Task<Product?> GetProductbyIdAsync(int id)
-    {
-        return await _context.Products
-        .AsNoTracking()
-        .FirstOrDefaultAsync(i => i.Id == id);
-    }
-
-    public async Task<Product?> GetProductbyIdWithInventoryAndCategoryAsync(int id)
-    {
-        return await _context.Products
-        .AsNoTracking()
-        .Include(i => i.Inventory)
-        .Include(i => i.Category)
-        .FirstOrDefaultAsync(i => i.Id == id);
-    }
 
 }

@@ -117,6 +117,7 @@ public class StripeWebhookcontroller : ControllerBase
 
         var order = new Order
         {
+            Id = orderId,
             CustomerName = session.CustomerDetails.Name,
             CustomerEmail = session.CustomerDetails.Email,
             CustomerPhone = session.CustomerDetails.Phone,
@@ -128,7 +129,7 @@ public class StripeWebhookcontroller : ControllerBase
             Country = session.CollectedInformation.ShippingDetails.Address.Country,
             Status = "Paid"
         };
-        _service.OrderUpdate(orderId, order);
+        _service.OrderUpdate(order);
 
         decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m, 2);
         var payment = new Payment
