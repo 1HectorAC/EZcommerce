@@ -167,16 +167,16 @@ public class EZcommerceService : IEZcommerceService
         if (order is null)
             throw new Exception();
 
-        order.CustomerName = model.CustomerName;
-        order.CustomerEmail = model.CustomerEmail;
-        order.CustomerPhone = model.CustomerPhone;
-        order.ShippingAddressLine1 = model.ShippingAddressLine1;
-        order.ShippingAddressLine2 = model.ShippingAddressLine2;
-        order.City = model.City;
-        order.State = model.State;
-        order.ZipCode = model.ZipCode;
-        order.Country = model.Country;
-        order.Status = model.Status;
+        order.CustomerName = model.CustomerName ?? order.CustomerName;
+        order.CustomerEmail = model.CustomerEmail ?? order.CustomerEmail;
+        order.CustomerPhone = model.CustomerPhone ?? order.CustomerPhone;
+        order.ShippingAddressLine1 = model.ShippingAddressLine1 ?? order.ShippingAddressLine1;
+        order.ShippingAddressLine2 = model.ShippingAddressLine2 ?? order.ShippingAddressLine2;
+        order.City = model.City ?? order.City;
+        order.State = model.State ?? order.State;
+        order.ZipCode = model.ZipCode ?? order.ZipCode;
+        order.Country = model.Country ?? order.Country;
+        order.Status = model.Status ?? order.State;
 
         await _context.SaveChangesAsync();
     }

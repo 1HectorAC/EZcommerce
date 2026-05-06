@@ -8,41 +8,36 @@ public class OrderViewModel
 {
     public int Id {get; set;}
 
-    [Required]
     [StringLength(100)]
-    public required string CustomerName {get; set;}
+    public string? CustomerName {get; set;}
 
-    [Required]
     [EmailAddress]
     [StringLength(254)]
-    public required string CustomerEmail {get; set;}
+    public string? CustomerEmail {get; set;}
 
     [StringLength(10)]
     public string? CustomerPhone {get; set;}
 
-    [Required]
-    [StringLength(100)]
-    public required string ShippingAddressLine1 {get; set;}
 
-    [Required]
     [StringLength(100)]
-    public required string ShippingAddressLine2 {get; set;}
+    public  string? ShippingAddressLine1 {get; set;}
 
-    [Required]
-    [StringLength(100)]
-    public required string City {get; set;}
 
-    [Required]
     [StringLength(100)]
-    public required string State {get; set;}
+    public string? ShippingAddressLine2 {get; set;}
 
-    [Required]
-    [StringLength(100)]
-    public required string ZipCode {get; set;}
 
-    [Required]
     [StringLength(100)]
-    public required string Country {get; set;}
+    public string? City {get; set;}
+
+    [StringLength(100)]
+    public string? State {get; set;}
+
+    [StringLength(100)]
+    public string? ZipCode {get; set;}
+
+    [StringLength(100)]
+    public string? Country {get; set;}
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
