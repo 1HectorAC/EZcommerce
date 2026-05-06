@@ -57,4 +57,11 @@ public class CartController : Controller
         return Ok(totalCount);
     }
 
+    // Consider adding confimation page
+    public IActionResult ClearCart()
+    {
+        _cart.ClearCart();
+        return RedirectToAction("Index");
+    }
+
 }
