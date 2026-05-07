@@ -107,7 +107,7 @@ public class ProductController : Controller
     {
         try
         {
-            _service.ProductRemove(id);
+            await _service.ProductRemove(id);
         }
         catch (Exception ex)
         {

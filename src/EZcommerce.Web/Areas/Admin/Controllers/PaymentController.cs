@@ -71,7 +71,7 @@ public class PaymentController : Controller
     {
         try
         {
-            _service.PaymentRemove(id);
+            await _service.PaymentRemove(id);
         }
         catch (Exception ex)
         {

@@ -13,20 +13,51 @@ public class EZcommerceRepository: IEZcommerceRepository
         _context = context;
     }
 
+    public async Task<List<Product>> ProductGetAllAsync()
+    {
+        return await _context.Products.AsNoTracking().ToListAsync();
+    }
+    public async Task<List<Product>> ProductGetAllWithInventoryAsync()
+    {
+                return await _context.Products.AsNoTracking().Include(i => i.Inventory).ToListAsync();
+    }
     public async Task<bool> ProductAnyAsync(int id)
     {
         return await _context.Products.AsNoTracking().AnyAsync(i => i.Id == id);
     }
-
     public async Task<Product?> ProductGetByIdAsync(int id)
     {
         return await _context.Products.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
     }
+    public async Task<Product?> ProductGetByIdWithTrackingAsync(int id)
+    {
+                return await _context.Products.FirstOrDefaultAsync(i => i.Id == id);
 
+    }
+    public async Task<Product?> ProductGetByIdWithInventoryWithTrackingAsync(int id)
+    {
+        return await _context.Products.Include(i => i.Inventory).FirstOrDefaultAsync(i => i.Id == id);
+
+    }
     public async Task<Product?> ProductGetByIdWithInventoryAsync(int id)
     {
         return await _context.Products.AsNoTracking().Include(i => i.Inventory).FirstOrDefaultAsync(i => i.Id == id);
     }
+    public async Task<Product?> ProductGetByIdWithInventoryAndCategoryAsync(int id)
+    {
+        return await _context.Products.AsNoTracking().Include(i => i.Inventory).Include(i => i.Category).FirstOrDefaultAsync(i => i.Id == id);
+    }
+    public async Task ProductAddAndSaveAsync(Product product)
+    {
+        await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
+    }
+    public async Task ProductRemoveAndSaveAsync(Product product)
+    {
+         _context.Products.Remove(product);
+         await _context.SaveChangesAsync();
+    }
+
 
 
     public async Task<List<Order>> OrderGetAllAsync()
@@ -37,7 +68,7 @@ public class EZcommerceRepository: IEZcommerceRepository
     {
         return await _context.Orders.AsNoTracking().FirstOrDefaultAsync( i => i.Id == id);
     }
-    public async Task<Order?> OrderGetByIdNoTrackingAsync(int id)
+    public async Task<Order?> OrderGetByIdWithTrackingAsync(int id)
     {
         return await _context.Orders.FirstOrDefaultAsync( i => i.Id == id);
     }
@@ -55,6 +86,38 @@ public class EZcommerceRepository: IEZcommerceRepository
         _context.Orders.Remove(order);
         await _context.SaveChangesAsync();
     }
+
+
+    public async Task<List<Payment>> PaymentGetAllAsync()
+    {
+        return await _context.Payments.AsNoTracking().ToListAsync();
+    }
+    public async Task<Payment?> PaymentGetByIdAsync(int id)
+    {
+        return await _context.Payments.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
+    }
+    public async Task<Payment?> PaymentGetByIdWithTrackingAsync(int id)
+    {
+                return await _context.Payments.FirstOrDefaultAsync(i => i.Id == id);
+
+    }
+    public async Task PaymentAddAndSaveAsync(Payment payment)
+    {
+        await _context.Payments.AddAsync(payment);
+        await _context.SaveChangesAsync();
+    }
+    public async Task PaymentRemoveAndSaveAsync(Payment payment)
+    {
+        _context.Payments.Remove(payment);
+        await _context.SaveChangesAsync();
+    }
+
+
+    public async Task<List<Category>> CategoryGetAllAsync()
+    {
+        return await _context.Categories.AsNoTracking().ToListAsync();
+    }
+
 
     public async Task<Inventory?> InventoryGetByProductIdAsync(int id)
     {

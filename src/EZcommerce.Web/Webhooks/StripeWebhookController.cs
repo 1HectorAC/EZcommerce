@@ -88,7 +88,7 @@ public class StripeWebhookcontroller : ControllerBase
             try
             {
                 await _service.OrderInventoryRollback(orderId);
-                _service.OrderRemove(orderId);
+                await _service.OrderRemove(orderId);
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ public class StripeWebhookcontroller : ControllerBase
             Country = session.CollectedInformation.ShippingDetails.Address.Country,
             Status = "Paid"
         };
-        _service.OrderUpdate(order);
+        await _service.OrderUpdate(order);
 
         decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m, 2);
         var payment = new Payment
@@ -140,7 +140,7 @@ public class StripeWebhookcontroller : ControllerBase
             Status = "Paid",
             TransactionReference = charge!.Id
         };
-        _service.PaymentCreate(payment);
+        await _service.PaymentCreate(payment);
 
         // send email
     }

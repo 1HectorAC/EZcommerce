@@ -9,17 +9,11 @@ namespace EZcommerce.Web.Services.Implementations;
 
 public class EZcommerceService : IEZcommerceService
 {
-
-    // Change to use EZcommerce repo later
-    private readonly EZcommerceDbContext _context;
-
     private readonly EZcommerceRepository _repo;
-    public EZcommerceService(EZcommerceDbContext context, EZcommerceRepository repo)
+    public EZcommerceService(EZcommerceRepository repo)
     {
-        _context = context;
         _repo = repo;
     }
-
 
     // maybe put validations in OrderValidation class
     public async Task ValidateCart(List<CartItem> items)
@@ -83,7 +77,7 @@ public class EZcommerceService : IEZcommerceService
             OrderItems = orderItems
         };
         await _repo.OrderAddAndSaveAsync(order);
-        
+
         return order.Id;
     }
 
@@ -97,7 +91,7 @@ public class EZcommerceService : IEZcommerceService
             inventory.Quantity -= item.Quantity;
 
         }
-        await _context.SaveChangesAsync();
+        await _repo.SaveChangesAsync();
     }
 
     public async Task<List<Order>> OrderGetAllAsync()
@@ -116,25 +110,25 @@ public class EZcommerceService : IEZcommerceService
     {
         if (!await _repo.OrderAnyAsync(orderId))
             throw new Exception("Order not exits in OrderInventoryRollback function");
-        
+
         var orderItems = await _repo.OrderItemGetByOrderIdWithProductAndInventoryAsync(orderId);
 
         foreach (var item in orderItems)
         {
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
-        _context.SaveChanges();
+        await _repo.SaveChangesAsync();
     }
 
     public async Task OrderRemove(int orderId)
     {
-        var order = await _repo.OrderGetByIdNoTrackingAsync(orderId) ?? throw new Exception();
+        var order = await _repo.OrderGetByIdWithTrackingAsync(orderId) ?? throw new Exception();
         await _repo.OrderRemoveAndSaveAsync(order);
     }
 
-    public void OrderUpdate(Order orderChanges)
+    public async Task OrderUpdate(Order orderChanges)
     {
-        var order = _context.Orders.FirstOrDefault(i => i.Id == orderChanges.Id);
+        var order = await _repo.OrderGetByIdWithTrackingAsync(orderChanges.Id);
         if (order is null)
         {
             throw new Exception("OrderUpdate: Order does not exits.");
@@ -150,13 +144,12 @@ public class EZcommerceService : IEZcommerceService
         order.Country = orderChanges.Country ?? order.Country;
         order.Status = orderChanges.Status ?? order.Status;
 
-        _context.SaveChanges();
+        await _repo.SaveChangesAsync();
     }
 
     public async Task OrderUpdateAsync(OrderViewModel model)
     {
-        var order = _context.Orders
-            .FirstOrDefault(i => i.Id == model.Id);
+        var order = await _repo.OrderGetByIdWithTrackingAsync(model.Id);
         if (order is null)
             throw new Exception();
 
@@ -171,42 +164,27 @@ public class EZcommerceService : IEZcommerceService
         order.Country = model.Country ?? order.Country;
         order.Status = model.Status ?? order.State;
 
-        await _context.SaveChangesAsync();
+        await _repo.SaveChangesAsync();
     }
 
     public async Task<List<Product>> GetProductsAsync()
     {
-        return await _context.Products
-        .AsNoTracking()
-        .ToListAsync();
+        return await _repo.ProductGetAllAsync();
     }
 
     public async Task<List<Product>> ProductGetAllIncludeInventoryAsync()
     {
-        var products = await _context.Products
-            .AsNoTracking()
-            .Include(i => i.Inventory)
-            .ToListAsync();
-        return products;
+        return await _repo.ProductGetAllWithInventoryAsync(); ;
     }
 
     public async Task<Product?> ProductGetWithInventoryAsync(int id)
     {
-        var product = await _context.Products
-            .AsNoTracking()
-            .Include(i => i.Inventory)
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        return product;
+        return await _repo.ProductGetByIdWithInventoryAsync(id);
     }
 
-        public async Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id)
+    public async Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id)
     {
-        return await _context.Products
-        .AsNoTracking()
-        .Include(i => i.Inventory)
-        .Include(i => i.Category)
-        .FirstOrDefaultAsync(i => i.Id == id);
+        return await _repo.ProductGetByIdWithInventoryAndCategoryAsync(id);
     }
 
     public async Task ProductCreateWithInventory(ProductCreateViewModel model)
@@ -221,16 +199,13 @@ public class EZcommerceService : IEZcommerceService
             Created_at = DateTime.UtcNow,
             Inventory = new Inventory { Quantity = model.InventoryQuantity }
         };
-        await _context.Products.AddAsync(product);
-        await _context.SaveChangesAsync();
+        await _repo.ProductAddAndSaveAsync(product);
     }
 
     public async Task ProductEditWithInventory(ProductCreateViewModel model)
     {
-        var product = _context.Products
-            .Include(i => i.Inventory)
-            .FirstOrDefault(i => i.Id == model.Id);
-        if (product is null || product.Inventory is null)
+        var product = await _repo.ProductGetByIdWithInventoryWithTrackingAsync(model.Id);
+        if (product is null)
             throw new Exception();
 
         product.Name = model.Name;
@@ -238,70 +213,55 @@ public class EZcommerceService : IEZcommerceService
         product.Price = model.Price;
         product.ImageUrl = model.ImageUrl;
         product.CategoryId = model.CategoryId;
-        product.Inventory.Quantity = model.InventoryQuantity;
+        product.Inventory!.Quantity = model.InventoryQuantity;
 
-        await _context.SaveChangesAsync();
+        await _repo.SaveChangesAsync();
 
     }
 
-    public void ProductRemove(int id)
+    public async Task ProductRemove(int id)
     {
-        var product = _context.Products.FirstOrDefault(i => i.Id == id) ?? throw new Exception();
-        _context.Remove(product);
-        _context.SaveChanges();
+        var product = await _repo.ProductGetByIdWithTrackingAsync(id) ?? throw new Exception();
+        await _repo.ProductRemoveAndSaveAsync(product);
     }
 
     public async Task<List<Payment>> PaymentGetAllAsync()
     {
-        var payments = await _context.Payments
-            .AsNoTracking()
-            .ToListAsync();
-        return payments;
+        return await _repo.PaymentGetAllAsync();
     }
 
     public async Task<Payment?> PaymentGetByIdAsync(int id)
     {
-        var payment = await _context.Payments
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        return payment;
+        return await _repo.PaymentGetByIdAsync(id);
     }
 
     public async Task PaymentEditAsync(Payment payment)
     {
-        var oldPayment = _context.Payments
-            .FirstOrDefault(i => i.Id == payment.Id) ?? throw new Exception();
+        var oldPayment = await _repo.PaymentGetByIdWithTrackingAsync(payment.Id) ?? throw new Exception();
         oldPayment.OrderId = payment.OrderId;
         oldPayment.Amount = payment.Amount;
         oldPayment.Method = payment.Method;
         oldPayment.Status = payment.Status;
         oldPayment.TransactionReference = payment.TransactionReference;
 
-
-        await _context.SaveChangesAsync();
+        await _repo.SaveChangesAsync();
     }
 
 
-    public void PaymentCreate(Payment payment)
+    public async Task PaymentCreate(Payment payment)
     {
-        _context.Add(payment);
-        _context.SaveChanges();
+        await _repo.PaymentAddAndSaveAsync(payment);
     }
 
-    public void PaymentRemove(int id)
+    public async Task PaymentRemove(int id)
     {
-        var product = _context.Products.FirstOrDefault(i => i.Id == id) ?? throw new Exception();
-        _context.Remove(product);
-        _context.SaveChanges();
+        var payment = await _repo.PaymentGetByIdWithTrackingAsync(id) ?? throw new Exception();
+        await _repo.PaymentRemoveAndSaveAsync(payment);
     }
 
     public async Task<List<Category>> CategoryGetAllAsync()
     {
-        var categories = await _context.Categories
-            .AsNoTracking().ToListAsync();
-
-        return categories;
+        return await _repo.CategoryGetAllAsync();
     }
 
 }
