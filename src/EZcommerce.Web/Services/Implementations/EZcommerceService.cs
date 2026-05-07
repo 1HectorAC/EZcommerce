@@ -2,17 +2,34 @@ using EZcommerce.Web.Data;
 using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Models.ViewModels;
-using EZcommerce.Web.Repositories.Implementations;
+using EZcommerce.Web.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace EZcommerce.Web.Services.Implementations;
 
 public class EZcommerceService : IEZcommerceService
 {
-    private readonly EZcommerceRepository _repo;
-    public EZcommerceService(EZcommerceRepository repo)
+    private readonly IGenericRepository<Product> _productRepo;
+    private readonly IGenericRepository<Order> _orderRepo;
+    private readonly IGenericRepository<Payment> _paymentRepo;
+    private readonly IGenericRepository<Inventory> _inventoryRepo;
+    private readonly IGenericRepository<Category> _categoryRepo;
+    private readonly IGenericRepository<OrderItem> _orderItemRepo;
+
+    public EZcommerceService(
+         IGenericRepository<Product> productRepo,
+         IGenericRepository<Order> orderRepo,
+         IGenericRepository<Payment> paymentRepo,
+         IGenericRepository<Inventory> inventoryRepo,
+         IGenericRepository<Category> categoryRepo,
+         IGenericRepository<OrderItem> orderItemRepo)
     {
-        _repo = repo;
+        _productRepo = productRepo;
+        _orderRepo = orderRepo;
+        _paymentRepo = paymentRepo;
+        _inventoryRepo = inventoryRepo;
+        _categoryRepo = categoryRepo;
+        _orderItemRepo = orderItemRepo;
     }
 
     // maybe put validations in OrderValidation class
@@ -27,20 +44,24 @@ public class EZcommerceService : IEZcommerceService
     }
     private async Task ValidateProductExists(CartItem item)
     {
-        if (!await _repo.ProductAnyAsync(item.ProductId))
+        if (!await _productRepo.Query().AsNoTracking().AnyAsync(i => i.Id == item.ProductId))
             throw new Exception("Product does not exits");
     }
 
     private async Task ValidatePrice(CartItem item)
     {
-        var product = await _repo.ProductGetByIdAsync(item.ProductId);
+        var product = await _productRepo.GetByIdAsync(item.ProductId);
 
         if (product!.Price != item.PriceSnapshot)
             throw new Exception("Price mismatch");
     }
     private async Task ValidateInventory(CartItem item)
     {
-        var product = await _repo.ProductGetByIdWithInventoryAsync(item.ProductId);
+        var product = await _productRepo
+            .Query()
+            .AsNoTracking()
+            .Include(i => i.Inventory)
+            .FirstOrDefaultAsync(i => i.Id == item.ProductId);
 
         if (product!.Inventory!.Quantity < item.Quantity)
             throw new Exception("Not enough Inventory");
@@ -76,7 +97,8 @@ public class EZcommerceService : IEZcommerceService
             CreatedAt = DateTime.UtcNow,
             OrderItems = orderItems
         };
-        await _repo.OrderAddAndSaveAsync(order);
+        await _orderRepo.AddAsync(order);
+        await _orderRepo.SaveChangesAsync();
 
         return order.Id;
     }
@@ -85,50 +107,109 @@ public class EZcommerceService : IEZcommerceService
     {
         foreach (var item in items)
         {
-            var inventory = await _repo.InventoryGetByProductIdAsync(item.ProductId);
-            if (inventory == null)
-                throw new Exception("Inventory not exits error");
-            inventory.Quantity -= item.Quantity;
+            var inventory = await _inventoryRepo
+                .Query()
+                .FirstOrDefaultAsync(i => i.ProductId == item.ProductId)
+                ?? throw new Exception("Inventory not exits");
 
+            inventory.Quantity -= item.Quantity;
         }
-        await _repo.SaveChangesAsync();
+        await _inventoryRepo.SaveChangesAsync();
     }
+
+
+    public async Task<List<Product>> ProductGetAllWithInventoryAndCategoryAsync()
+    {
+        return await _productRepo.Query()
+            .AsNoTracking()
+            .Include(i => i.Inventory)
+            .Include(i => i.Category)
+            .ToListAsync();
+    }
+    public async Task<Product?> ProductGetByIdWithInventoryAndCategoryAsync(int id)
+    {
+        return await _productRepo.Query()
+            .AsNoTracking()
+            .Include(i => i.Inventory)
+            .Include(i => i.Category)
+            .FirstOrDefaultAsync(i => i.Id == id);
+    }
+    public async Task ProductAndInventoryAddAsync(ProductCreateViewModel model)
+    {
+        var product = new Product
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Price = model.Price,
+            ImageUrl = model.ImageUrl,
+            CategoryId = model.CategoryId,
+            Created_at = DateTime.UtcNow,
+            Inventory = new Inventory { Quantity = model.InventoryQuantity }
+        };
+        await _productRepo.AddAsync(product);
+        await _productRepo.SaveChangesAsync();
+    }
+    public async Task ProductAndInventoryUpdateAsync(ProductCreateViewModel model)
+    {
+        var product = await _productRepo.Query()
+            .Include(i => i.Inventory)
+            .FirstOrDefaultAsync(i => i.Id == model.Id);
+
+        if (product is null)
+            throw new Exception();
+
+        product.Name = model.Name;
+        product.Description = model.Description;
+        product.Price = model.Price;
+        product.ImageUrl = model.ImageUrl;
+        product.CategoryId = model.CategoryId;
+        product.Inventory!.Quantity = model.InventoryQuantity;
+
+        await _productRepo.SaveChangesAsync();
+    }
+    public async Task ProductRemoveAsync(int id)
+    {
+        var product = await _productRepo.GetByIdAsync(id) ?? throw new Exception();
+
+        _productRepo.Remove(product);
+        await _productRepo.SaveChangesAsync();
+    }
+
 
     public async Task<List<Order>> OrderGetAllAsync()
     {
-        var orders = await _repo.OrderGetAllAsync();
-        return orders;
+        return await _orderRepo
+            .Query()
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<Order?> OrderGetByIdAsync(int id)
     {
-        var order = await _repo.OrderGetByIdAsync(id);
-        return order;
+        return await _orderRepo.GetByIdAsync(id);
     }
 
-    public async Task OrderInventoryRollback(int orderId)
+    public async Task OrderInventoryRollbackAsync(int orderId)
     {
-        if (!await _repo.OrderAnyAsync(orderId))
+        if (!await _orderRepo.Query().AsNoTracking().AnyAsync(i => i.Id == orderId))
             throw new Exception("Order not exits in OrderInventoryRollback function");
 
-        var orderItems = await _repo.OrderItemGetByOrderIdWithProductAndInventoryAsync(orderId);
+        var orderItems = await _orderItemRepo
+            .Query()
+            .Include(i => i.Product)
+            .ThenInclude(j => j!.Inventory)
+            .Where(i => i.OrderId == orderId)
+            .ToListAsync();
 
         foreach (var item in orderItems)
         {
             item.Product!.Inventory!.Quantity += item.Quantity;
         }
-        await _repo.SaveChangesAsync();
+        await _orderRepo.SaveChangesAsync();
     }
-
-    public async Task OrderRemove(int orderId)
+    public async Task OrderUpdateAsync(Order orderChanges)
     {
-        var order = await _repo.OrderGetByIdWithTrackingAsync(orderId) ?? throw new Exception();
-        await _repo.OrderRemoveAndSaveAsync(order);
-    }
-
-    public async Task OrderUpdate(Order orderChanges)
-    {
-        var order = await _repo.OrderGetByIdWithTrackingAsync(orderChanges.Id);
+        var order = await _orderRepo.GetByIdAsync(orderChanges.Id);
         if (order is null)
         {
             throw new Exception("OrderUpdate: Order does not exits.");
@@ -144,12 +225,12 @@ public class EZcommerceService : IEZcommerceService
         order.Country = orderChanges.Country ?? order.Country;
         order.Status = orderChanges.Status ?? order.Status;
 
-        await _repo.SaveChangesAsync();
+        await _orderRepo.SaveChangesAsync();
     }
 
     public async Task OrderUpdateAsync(OrderViewModel model)
     {
-        var order = await _repo.OrderGetByIdWithTrackingAsync(model.Id);
+        var order = await _orderRepo.GetByIdAsync(model.Id);
         if (order is null)
             throw new Exception();
 
@@ -164,104 +245,57 @@ public class EZcommerceService : IEZcommerceService
         order.Country = model.Country ?? order.Country;
         order.Status = model.Status ?? order.State;
 
-        await _repo.SaveChangesAsync();
+        await _orderRepo.SaveChangesAsync();
     }
-
-    public async Task<List<Product>> GetProductsAsync()
+        public async Task OrderRemoveAsync(int orderId)
     {
-        return await _repo.ProductGetAllAsync();
+        var order = await _orderRepo.GetByIdAsync(orderId) ?? throw new Exception();
+        _orderRepo.Remove(order);
+        await _orderRepo.SaveChangesAsync();
     }
 
-    public async Task<List<Product>> ProductGetAllIncludeInventoryAsync()
-    {
-        return await _repo.ProductGetAllWithInventoryAsync(); ;
-    }
-
-    public async Task<Product?> ProductGetWithInventoryAsync(int id)
-    {
-        return await _repo.ProductGetByIdWithInventoryAsync(id);
-    }
-
-    public async Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id)
-    {
-        return await _repo.ProductGetByIdWithInventoryAndCategoryAsync(id);
-    }
-
-    public async Task ProductCreateWithInventory(ProductCreateViewModel model)
-    {
-        var product = new Product
-        {
-            Name = model.Name,
-            Description = model.Description,
-            Price = model.Price,
-            ImageUrl = model.ImageUrl,
-            CategoryId = model.CategoryId,
-            Created_at = DateTime.UtcNow,
-            Inventory = new Inventory { Quantity = model.InventoryQuantity }
-        };
-        await _repo.ProductAddAndSaveAsync(product);
-    }
-
-    public async Task ProductEditWithInventory(ProductCreateViewModel model)
-    {
-        var product = await _repo.ProductGetByIdWithInventoryWithTrackingAsync(model.Id);
-        if (product is null)
-            throw new Exception();
-
-        product.Name = model.Name;
-        product.Description = model.Description;
-        product.Price = model.Price;
-        product.ImageUrl = model.ImageUrl;
-        product.CategoryId = model.CategoryId;
-        product.Inventory!.Quantity = model.InventoryQuantity;
-
-        await _repo.SaveChangesAsync();
-
-    }
-
-    public async Task ProductRemove(int id)
-    {
-        var product = await _repo.ProductGetByIdWithTrackingAsync(id) ?? throw new Exception();
-        await _repo.ProductRemoveAndSaveAsync(product);
-    }
 
     public async Task<List<Payment>> PaymentGetAllAsync()
     {
-        return await _repo.PaymentGetAllAsync();
+        return await _paymentRepo
+            .Query()
+            .AsNoTracking()
+            .ToListAsync();
     }
-
     public async Task<Payment?> PaymentGetByIdAsync(int id)
     {
-        return await _repo.PaymentGetByIdAsync(id);
+        return await _paymentRepo
+            .Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == id);
     }
-
-    public async Task PaymentEditAsync(Payment payment)
+    public async Task PaymentAddAsync(Payment payment)
     {
-        var oldPayment = await _repo.PaymentGetByIdWithTrackingAsync(payment.Id) ?? throw new Exception();
+        await _paymentRepo.AddAsync(payment);
+        await _paymentRepo.SaveChangesAsync();
+    }
+    public async Task PaymentUpdateAsync(Payment payment)
+    {
+        var oldPayment = await _paymentRepo.GetByIdAsync(payment.Id) ?? throw new Exception();
         oldPayment.OrderId = payment.OrderId;
         oldPayment.Amount = payment.Amount;
         oldPayment.Method = payment.Method;
         oldPayment.Status = payment.Status;
         oldPayment.TransactionReference = payment.TransactionReference;
 
-        await _repo.SaveChangesAsync();
+        await _paymentRepo.SaveChangesAsync();
     }
-
-
-    public async Task PaymentCreate(Payment payment)
+    public async Task PaymentRemoveAsync(int id)
     {
-        await _repo.PaymentAddAndSaveAsync(payment);
-    }
+        var payment = await _paymentRepo.GetByIdAsync(id) ?? throw new Exception();
 
-    public async Task PaymentRemove(int id)
-    {
-        var payment = await _repo.PaymentGetByIdWithTrackingAsync(id) ?? throw new Exception();
-        await _repo.PaymentRemoveAndSaveAsync(payment);
+        _paymentRepo.Remove(payment);
+        await _paymentRepo.SaveChangesAsync();
     }
 
     public async Task<List<Category>> CategoryGetAllAsync()
     {
-        return await _repo.CategoryGetAllAsync();
+        return await _categoryRepo.Query().AsNoTracking().ToListAsync();
     }
 
 }

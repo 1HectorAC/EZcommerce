@@ -12,7 +12,9 @@ public class EZcommerceRepository: IEZcommerceRepository
     {
         _context = context;
     }
+    // Maybe delete later
 
+    /*
     public async Task<List<Product>> ProductGetAllAsync()
     {
         return await _context.Products.AsNoTracking().ToListAsync();
@@ -112,8 +114,7 @@ public class EZcommerceRepository: IEZcommerceRepository
         await _context.SaveChangesAsync();
     }
 
-
-    public async Task<List<Category>> CategoryGetAllAsync()
+        public async Task<List<Category>> CategoryGetAllAsync()
     {
         return await _context.Categories.AsNoTracking().ToListAsync();
     }
@@ -126,7 +127,7 @@ public class EZcommerceRepository: IEZcommerceRepository
 
     public async Task<List<OrderItem>> OrderItemGetByOrderIdWithProductAndInventoryAsync(int orderId)
     {
-        return await _context.OrderItems.Include(i => i.Product).ThenInclude(j => j.Inventory).Where(i => i.OrderId == orderId).ToListAsync();
+        return await _context.OrderItems.Include(i => i.Product).ThenInclude(j => j!.Inventory).Where(i => i.OrderId == orderId).ToListAsync();
     }
 
 
@@ -134,6 +135,9 @@ public class EZcommerceRepository: IEZcommerceRepository
     {
         await _context.SaveChangesAsync();
     }
+    */
+
+
 
 
 }

@@ -19,13 +19,13 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var products = await _service.GetProductsAsync();
+        var products = await _service.ProductGetAllWithInventoryAndCategoryAsync();
         return View(products);
     }
 
     public async Task<IActionResult> ProductDetails(int id)
     {
-        var product = await _service.ProductGetbyIdWithInventoryAndCategoryAsync(id);
+        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
         if(product is null)
         {
             return RedirectToAction("Home", "Index");

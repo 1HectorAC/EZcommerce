@@ -86,7 +86,7 @@ public class OrderController : Controller
     {
         try
         {
-            await _service.OrderRemove(id);
+            await _service.OrderRemoveAsync(id);
         }
         catch (Exception ex)
         {

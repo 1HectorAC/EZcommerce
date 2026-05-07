@@ -17,7 +17,7 @@ public class ProductController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        var products = await _service.ProductGetAllIncludeInventoryAsync();
+        var products = await _service.ProductGetAllWithInventoryAndCategoryAsync();
         return View(products);
     }
 
@@ -39,14 +39,14 @@ public class ProductController : Controller
             return View(model);
         }
 
-        await _service.ProductCreateWithInventory(model);
+        await _service.ProductAndInventoryAddAsync(model);
 
         return RedirectToAction("Index");
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var product = await _service.ProductGetWithInventoryAsync(id);
+        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
         if (product is null)
         {
             Console.WriteLine("Product/Edit Error: product was null");
@@ -79,7 +79,7 @@ public class ProductController : Controller
         }
         try
         {
-            await _service.ProductEditWithInventory(product);
+            await _service.ProductAndInventoryUpdateAsync(product);
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ public class ProductController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var product = await _service.ProductGetWithInventoryAsync(id);
+        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
 
         if (product is null)
         {
@@ -107,7 +107,7 @@ public class ProductController : Controller
     {
         try
         {
-            await _service.ProductRemove(id);
+            await _service.ProductRemoveAsync(id);
         }
         catch (Exception ex)
         {

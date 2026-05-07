@@ -17,7 +17,7 @@ public class StripeWebhookcontroller : ControllerBase
 
     private readonly StripeSettings _stripeSettings;
 
-    private readonly EZcommerce.Web.Services.CheckoutService _checkoutService;
+    private readonly Services.CheckoutService _checkoutService;
 
     private readonly IEZcommerceService _service;
 
@@ -87,8 +87,8 @@ public class StripeWebhookcontroller : ControllerBase
 
             try
             {
-                await _service.OrderInventoryRollback(orderId);
-                await _service.OrderRemove(orderId);
+                await _service.OrderInventoryRollbackAsync(orderId);
+                await _service.OrderRemoveAsync(orderId);
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ public class StripeWebhookcontroller : ControllerBase
             Country = session.CollectedInformation.ShippingDetails.Address.Country,
             Status = "Paid"
         };
-        await _service.OrderUpdate(order);
+        await _service.OrderUpdateAsync(order);
 
         decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m, 2);
         var payment = new Payment
@@ -140,7 +140,7 @@ public class StripeWebhookcontroller : ControllerBase
             Status = "Paid",
             TransactionReference = charge!.Id
         };
-        await _service.PaymentCreate(payment);
+        await _service.PaymentAddAsync(payment);
 
         // send email
     }

@@ -48,10 +48,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
 builder.Services.AddDbContext<EZcommerceDbContext>(
     options => options.UseSqlServer(Environment.GetEnvironmentVariable("DB_Connection")));
 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<EZcommerce.Web.Services.CheckoutService>();
 builder.Services.AddScoped<IEZcommerceRepository, EZcommerceRepository>();
 builder.Services.AddScoped<IEZcommerceService, EZcommerceService>();
-
 
 var app = builder.Build();
 

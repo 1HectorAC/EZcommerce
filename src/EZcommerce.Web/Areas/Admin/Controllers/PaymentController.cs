@@ -43,7 +43,7 @@ public class PaymentController : Controller
         }
         try
         {
-            await _service.PaymentEditAsync(payment);
+            await _service.PaymentUpdateAsync(payment);
         }
         catch (Exception ex)
         {
@@ -71,7 +71,7 @@ public class PaymentController : Controller
     {
         try
         {
-            await _service.PaymentRemove(id);
+            await _service.PaymentRemoveAsync(id);
         }
         catch (Exception ex)
         {

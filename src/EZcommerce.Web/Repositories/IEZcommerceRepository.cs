@@ -5,8 +5,9 @@ using EZcommerce.Web.Models.ViewModels;
 namespace EZcommerce.Web.Repositories;
 public interface IEZcommerceRepository
 {
-    // Consider Seperating Product/Order/Payment into seperate services
+    // Maybe delete later
 
+    /*
     Task<List<Product>> ProductGetAllAsync();
     Task<List<Product>> ProductGetAllWithInventoryAsync();
     Task<bool> ProductAnyAsync(int id);
@@ -38,5 +39,7 @@ public interface IEZcommerceRepository
     Task<List<OrderItem>> OrderItemGetByOrderIdWithProductAndInventoryAsync(int orderId);
 
     Task SaveChangesAsync();
+*/
+
 
 }

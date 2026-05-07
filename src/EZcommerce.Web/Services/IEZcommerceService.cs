@@ -15,28 +15,24 @@ public interface IEZcommerceService
 
     Task LowerInventoriesByCartItems(List<CartItem> items);
 
-    Task<List<Product>> GetProductsAsync();
-    Task<List<Product>> ProductGetAllIncludeInventoryAsync();
-    Task<Product?> ProductGetWithInventoryAsync(int id);
-    Task<Product?> ProductGetbyIdWithInventoryAndCategoryAsync(int id);
-    Task ProductCreateWithInventory(ProductCreateViewModel model);
-    Task ProductEditWithInventory(ProductCreateViewModel model);
-    Task ProductRemove(int id);
+    Task<List<Product>> ProductGetAllWithInventoryAndCategoryAsync();
+    Task<Product?> ProductGetByIdWithInventoryAndCategoryAsync(int id);
+    Task ProductAndInventoryAddAsync(ProductCreateViewModel model);
+    Task ProductAndInventoryUpdateAsync(ProductCreateViewModel model);
+    Task ProductRemoveAsync(int id);
 
     Task<List<Order>> OrderGetAllAsync();
     Task<Order?> OrderGetByIdAsync(int id);
-    Task OrderInventoryRollback(int orderId);
-    Task OrderRemove(int orderId);
-    Task OrderUpdate(Order orderChanges);
+    Task OrderInventoryRollbackAsync(int orderId);
+    Task OrderUpdateAsync(Order orderChanges);
     Task OrderUpdateAsync(OrderViewModel model);
+    Task OrderRemoveAsync(int orderId);
 
     Task<List<Payment>> PaymentGetAllAsync();
     Task<Payment?> PaymentGetByIdAsync(int id);
-    Task PaymentEditAsync(Payment payment);
-    Task PaymentCreate(Payment payment);
-    Task PaymentRemove(int id);
+    Task PaymentAddAsync(Payment payment);
+    Task PaymentUpdateAsync(Payment payment);
+    Task PaymentRemoveAsync(int id);
 
     Task<List<Category>> CategoryGetAllAsync();
-
-
 }
