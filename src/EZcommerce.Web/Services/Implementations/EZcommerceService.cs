@@ -12,7 +12,6 @@ public class EZcommerceService : IEZcommerceService
     private readonly IGenericRepository<Product> _productRepo;
     private readonly IGenericRepository<Order> _orderRepo;
     private readonly IGenericRepository<Payment> _paymentRepo;
-    private readonly IGenericRepository<Inventory> _inventoryRepo;
     private readonly IGenericRepository<Category> _categoryRepo;
     private readonly IGenericRepository<OrderItem> _orderItemRepo;
 
@@ -20,14 +19,12 @@ public class EZcommerceService : IEZcommerceService
          IGenericRepository<Product> productRepo,
          IGenericRepository<Order> orderRepo,
          IGenericRepository<Payment> paymentRepo,
-         IGenericRepository<Inventory> inventoryRepo,
          IGenericRepository<Category> categoryRepo,
          IGenericRepository<OrderItem> orderItemRepo)
     {
         _productRepo = productRepo;
         _orderRepo = orderRepo;
         _paymentRepo = paymentRepo;
-        _inventoryRepo = inventoryRepo;
         _categoryRepo = categoryRepo;
         _orderItemRepo = orderItemRepo;
     }
@@ -67,7 +64,7 @@ public class EZcommerceService : IEZcommerceService
             throw new Exception("Not enough Inventory");
     }
 
-    public async Task<int> InitiateOrderFromCartItems(List<CartItem> items)
+    public async Task<int> OrderAndOrderItemsAddFromCartItemsAsync(List<CartItem> items)
     {
         List<OrderItem> orderItems = new List<OrderItem>();
         foreach (var item in items)
@@ -103,18 +100,42 @@ public class EZcommerceService : IEZcommerceService
         return order.Id;
     }
 
-    public async Task LowerInventoriesByCartItems(List<CartItem> items)
+    public async Task AddQuantitiesToInventoriesFromOrderAsync(int orderId)
     {
-        foreach (var item in items)
-        {
-            var inventory = await _inventoryRepo
-                .Query()
-                .FirstOrDefaultAsync(i => i.ProductId == item.ProductId)
-                ?? throw new Exception("Inventory not exits");
+        var orderItems = await _orderItemRepo
+            .Query()
+            .Include(i => i.Product)
+            .ThenInclude(j => j!.Inventory)
+            .Where(i => i.OrderId == orderId)
+            .ToListAsync();
 
-            inventory.Quantity -= item.Quantity;
+        if (orderItems.Count <= 0)
+            throw new Exception("AddQuantitiesToInventoriesFromOrderAsync: no orderItems exits iwth orderId");
+
+        foreach (var item in orderItems)
+        {
+            item.Product!.Inventory!.Quantity += item.Quantity;
         }
-        await _inventoryRepo.SaveChangesAsync();
+        await _orderItemRepo.SaveChangesAsync();
+    }
+    public async Task SubtractQuantitiesToInventoriesFromOrderAsync(int orderId)
+    {
+        var orderItems = await _orderItemRepo
+                .Query()
+                .Include(i => i.Product)
+                .ThenInclude(j => j!.Inventory)
+                .Where(i => i.OrderId == orderId)
+                .ToListAsync();
+
+        if (orderItems.Count <= 0)
+            throw new Exception("SubtractQuantitiesToInventoriesFromOrderAsync: no orderItems exits iwth orderId");
+
+        foreach (var item in orderItems)
+        {
+            item.Product!.Inventory!.Quantity -= item.Quantity;
+        }
+        await _orderItemRepo.SaveChangesAsync();
+
     }
 
 
@@ -183,47 +204,27 @@ public class EZcommerceService : IEZcommerceService
             .AsNoTracking()
             .ToListAsync();
     }
-
     public async Task<Order?> OrderGetByIdAsync(int id)
     {
         return await _orderRepo.GetByIdAsync(id);
     }
-
-    public async Task OrderInventoryRollbackAsync(int orderId)
+    public async Task OrderUpdateAsync(Order order)
     {
-        if (!await _orderRepo.Query().AsNoTracking().AnyAsync(i => i.Id == orderId))
-            throw new Exception("Order not exits in OrderInventoryRollback function");
-
-        var orderItems = await _orderItemRepo
-            .Query()
-            .Include(i => i.Product)
-            .ThenInclude(j => j!.Inventory)
-            .Where(i => i.OrderId == orderId)
-            .ToListAsync();
-
-        foreach (var item in orderItems)
+        var oldOrder = await _orderRepo.GetByIdAsync(order.Id);
+        if (oldOrder is null)
         {
-            item.Product!.Inventory!.Quantity += item.Quantity;
+            throw new Exception("OrderUpdateAsync: Order does not exits.");
         }
-        await _orderRepo.SaveChangesAsync();
-    }
-    public async Task OrderUpdateAsync(Order orderChanges)
-    {
-        var order = await _orderRepo.GetByIdAsync(orderChanges.Id);
-        if (order is null)
-        {
-            throw new Exception("OrderUpdate: Order does not exits.");
-        }
-        order.CustomerName = orderChanges.CustomerName ?? order.CustomerName;
-        order.CustomerEmail = orderChanges.CustomerEmail ?? order.CustomerEmail;
-        order.CustomerPhone = orderChanges.CustomerPhone ?? order.CustomerPhone;
-        order.ShippingAddressLine1 = orderChanges.ShippingAddressLine1 ?? order.ShippingAddressLine1;
-        order.ShippingAddressLine2 = orderChanges.ShippingAddressLine2 ?? order.ShippingAddressLine2;
-        order.City = orderChanges.City ?? order.City;
-        order.State = orderChanges.State ?? order.State;
-        order.ZipCode = orderChanges.ZipCode ?? order.ZipCode;
-        order.Country = orderChanges.Country ?? order.Country;
-        order.Status = orderChanges.Status ?? order.Status;
+        oldOrder.CustomerName = order.CustomerName ?? oldOrder.CustomerName;
+        oldOrder.CustomerEmail = order.CustomerEmail ?? oldOrder.CustomerEmail;
+        oldOrder.CustomerPhone = order.CustomerPhone ?? oldOrder.CustomerPhone;
+        oldOrder.ShippingAddressLine1 = order.ShippingAddressLine1 ?? oldOrder.ShippingAddressLine1;
+        oldOrder.ShippingAddressLine2 = order.ShippingAddressLine2 ?? oldOrder.ShippingAddressLine2;
+        oldOrder.City = order.City ?? oldOrder.City;
+        oldOrder.State = order.State ?? oldOrder.State;
+        oldOrder.ZipCode = order.ZipCode ?? oldOrder.ZipCode;
+        oldOrder.Country = order.Country ?? oldOrder.Country;
+        oldOrder.Status = order.Status ?? oldOrder.Status;
 
         await _orderRepo.SaveChangesAsync();
     }
@@ -247,7 +248,7 @@ public class EZcommerceService : IEZcommerceService
 
         await _orderRepo.SaveChangesAsync();
     }
-        public async Task OrderRemoveAsync(int orderId)
+    public async Task OrderRemoveAsync(int orderId)
     {
         var order = await _orderRepo.GetByIdAsync(orderId) ?? throw new Exception();
         _orderRepo.Remove(order);

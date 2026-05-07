@@ -87,7 +87,7 @@ public class StripeWebhookcontroller : ControllerBase
 
             try
             {
-                await _service.OrderInventoryRollbackAsync(orderId);
+                await _service.AddQuantitiesToInventoriesFromOrderAsync(orderId);
                 await _service.OrderRemoveAsync(orderId);
             }
             catch (Exception ex)

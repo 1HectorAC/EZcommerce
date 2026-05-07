@@ -11,9 +11,9 @@ public interface IEZcommerceService
 
     Task ValidateCart(List<CartItem> items);
 
-    Task<int> InitiateOrderFromCartItems(List<CartItem> items);
-
-    Task LowerInventoriesByCartItems(List<CartItem> items);
+    Task<int> OrderAndOrderItemsAddFromCartItemsAsync(List<CartItem> items);
+    Task AddQuantitiesToInventoriesFromOrderAsync(int orderId);
+    Task SubtractQuantitiesToInventoriesFromOrderAsync(int orderId);
 
     Task<List<Product>> ProductGetAllWithInventoryAndCategoryAsync();
     Task<Product?> ProductGetByIdWithInventoryAndCategoryAsync(int id);
@@ -23,8 +23,7 @@ public interface IEZcommerceService
 
     Task<List<Order>> OrderGetAllAsync();
     Task<Order?> OrderGetByIdAsync(int id);
-    Task OrderInventoryRollbackAsync(int orderId);
-    Task OrderUpdateAsync(Order orderChanges);
+    Task OrderUpdateAsync(Order order);
     Task OrderUpdateAsync(OrderViewModel model);
     Task OrderRemoveAsync(int orderId);
 

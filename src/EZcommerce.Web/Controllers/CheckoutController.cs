@@ -38,11 +38,11 @@ public class CheckoutController: Controller
             return BadRequest(ex.Message);
         }
 
-        var orderId = await _service.InitiateOrderFromCartItems(cartItems);
+        var orderId = await _service.OrderAndOrderItemsAddFromCartItemsAsync(cartItems);
 
         // Note: check if concurent inventory update issue exists later.
         // Note: Add error handling/rollback of order if inventory change fail
-        await _service.LowerInventoriesByCartItems(cartItems);
+        await _service.SubtractQuantitiesToInventoriesFromOrderAsync(orderId);
 
         // pass string of orderId below
        var session = await _checkoutService.CreateCheckoutSession(cartItems, orderId.ToString());
