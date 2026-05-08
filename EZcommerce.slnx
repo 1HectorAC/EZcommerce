@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/EZcommerce.Web/EZcommerce.Web.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EZcommerce.Web.Tests/EZcommerce.Web.Tests.csproj" />
+  </Folder>
 </Solution>
