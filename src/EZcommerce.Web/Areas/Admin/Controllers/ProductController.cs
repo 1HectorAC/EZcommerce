@@ -11,13 +11,15 @@ namespace EZcommerce.Areas.Admin.Controllers;
 public class ProductController : Controller
 {
     private readonly IEZcommerceService _service;
-    public ProductController(IEZcommerceService service)
+    private readonly IProductService _productService;
+    public ProductController(IEZcommerceService service, IProductService productService)
     {
         _service = service;
+        _productService = productService;
     }
     public async Task<IActionResult> Index()
     {
-        var products = await _service.ProductGetAllWithInventoryAndCategoryAsync();
+        var products = await _productService.GetAllWithInventoryAndCategoryAsync();
         return View(products);
     }
 
@@ -39,14 +41,14 @@ public class ProductController : Controller
             return View(model);
         }
 
-        await _service.ProductAndInventoryAddAsync(model);
+        await _productService.AddWithInventoryAsync(model);
 
         return RedirectToAction("Index");
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
+        var product = await _productService.GetByIdWithInventoryAndCategoryAsync(id);
         if (product is null)
         {
             Console.WriteLine("Product/Edit Error: product was null");
@@ -79,7 +81,7 @@ public class ProductController : Controller
         }
         try
         {
-            await _service.ProductAndInventoryUpdateAsync(product);
+            await _productService.UpdateWithInventoryAsync(product);
         }
         catch (Exception ex)
         {
@@ -91,7 +93,7 @@ public class ProductController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
+        var product = await _productService.GetByIdWithInventoryAndCategoryAsync(id);
 
         if (product is null)
         {
@@ -107,7 +109,7 @@ public class ProductController : Controller
     {
         try
         {
-            await _service.ProductRemoveAsync(id);
+            await _productService.RemoveAsync(id);
         }
         catch (Exception ex)
         {

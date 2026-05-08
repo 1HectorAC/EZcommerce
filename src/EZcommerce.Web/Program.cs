@@ -52,6 +52,10 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<EZcommerce.Web.Services.CheckoutService>();
 builder.Services.AddScoped<IEZcommerceRepository, EZcommerceRepository>();
 builder.Services.AddScoped<IEZcommerceService, EZcommerceService>();
+builder.Services.AddScoped<IProductService, EZcommerce.Web.Services.Implementations.ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 
 var app = builder.Build();
 

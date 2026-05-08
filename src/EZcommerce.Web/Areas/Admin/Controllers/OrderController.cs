@@ -10,20 +10,20 @@ namespace EZcommerce.Areas.Admin.Controllers;
 [Controller]
 public class OrderController : Controller
 {
-    private readonly IEZcommerceService _service;
-    public OrderController(IEZcommerceService service)
+    private readonly IOrderService _orderService;
+    public OrderController(IOrderService orderService)
     {
-        _service = service;
+        _orderService = orderService;
     }
     public async Task<IActionResult> Index()
     {
-        var orders = await _service.OrderGetAllAsync();
+        var orders = await _orderService.GetAllAsync();
         return View(orders);
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var order = await _service.OrderGetByIdAsync(id);
+        var order = await _orderService.GetByIdAsync(id);
         if (order is null)
         {
             Console.WriteLine("Order/Edit Error: order was null");
@@ -58,7 +58,7 @@ public class OrderController : Controller
         }
         try
         {
-            await _service.OrderUpdateAsync(order);
+            await _orderService.UpdateAsync(order);
         }
         catch (Exception ex)
         {
@@ -70,7 +70,7 @@ public class OrderController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var order = await _service.OrderGetByIdAsync(id);
+        var order = await _orderService.GetByIdAsync(id);
 
         if (order is null)
         {
@@ -86,7 +86,7 @@ public class OrderController : Controller
     {
         try
         {
-            await _service.OrderRemoveAsync(id);
+            await _orderService.RemoveAsync(id);
         }
         catch (Exception ex)
         {

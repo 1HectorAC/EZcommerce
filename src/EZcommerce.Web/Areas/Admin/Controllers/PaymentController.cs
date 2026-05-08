@@ -9,28 +9,25 @@ namespace EZcommerce.Areas.Admin.Controllers;
 [Controller]
 public class PaymentController : Controller
 {
-    private readonly IEZcommerceService _service;
-    public PaymentController(IEZcommerceService service)
+    private readonly IPaymentService _paymentService;
+    public PaymentController(IPaymentService paymentService)
     {
-        _service = service;
+        _paymentService = paymentService;
     }
     public async Task<IActionResult> Index()
     {
-        var payments = await _service.PaymentGetAllAsync();
+        var payments = await _paymentService.GetAllAsync();
         return View(payments);
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var payment = await _service.PaymentGetByIdAsync(id);
+        var payment = await _paymentService.GetByIdAsync(id);
         if (payment is null)
         {
             Console.WriteLine("Payment/Edit Error: order was null");
             return BadRequest();
         }
-
-        
-
         return View(payment);
     }
 
@@ -43,7 +40,7 @@ public class PaymentController : Controller
         }
         try
         {
-            await _service.PaymentUpdateAsync(payment);
+            await _paymentService.UpdateAsync(payment);
         }
         catch (Exception ex)
         {
@@ -55,14 +52,13 @@ public class PaymentController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var payment = await _service.PaymentGetByIdAsync(id);
+        var payment = await _paymentService.GetByIdAsync(id);
 
         if (payment is null)
         {
             Console.WriteLine("Payment/Delete, product is null");
             return BadRequest();
         }
-
         return View(payment);
     }
 
@@ -71,7 +67,7 @@ public class PaymentController : Controller
     {
         try
         {
-            await _service.PaymentRemoveAsync(id);
+            await _paymentService.RemoveAsync(id);
         }
         catch (Exception ex)
         {

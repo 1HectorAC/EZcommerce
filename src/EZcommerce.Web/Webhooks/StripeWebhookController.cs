@@ -16,16 +16,24 @@ public class StripeWebhookcontroller : ControllerBase
 {
 
     private readonly StripeSettings _stripeSettings;
-
     private readonly Services.CheckoutService _checkoutService;
-
     private readonly IEZcommerceService _service;
+    private readonly IOrderService _orderService;
+    private readonly IPaymentService _paymentService;
 
-    public StripeWebhookcontroller(IOptions<StripeSettings> stripeSettings, IEZcommerceService service, EZcommerce.Web.Services.CheckoutService checkoutService)
+    public StripeWebhookcontroller(
+        IOptions<StripeSettings> stripeSettings,
+         IEZcommerceService service,
+          EZcommerce.Web.Services.CheckoutService checkoutService,
+          IOrderService orderService,
+          IPaymentService paymentService
+          )
     {
         _stripeSettings = stripeSettings.Value;
         _checkoutService = checkoutService;
         _service = service;
+        _orderService = orderService;
+        _paymentService = paymentService;
     }
 
     [HttpPost]
@@ -88,7 +96,7 @@ public class StripeWebhookcontroller : ControllerBase
             try
             {
                 await _service.AddQuantitiesToInventoriesFromOrderAsync(orderId);
-                await _service.OrderRemoveAsync(orderId);
+                await _orderService.RemoveAsync(orderId);
             }
             catch (Exception ex)
             {
@@ -129,7 +137,7 @@ public class StripeWebhookcontroller : ControllerBase
             Country = session.CollectedInformation.ShippingDetails.Address.Country,
             Status = "Paid"
         };
-        await _service.OrderUpdateAsync(order);
+        await _orderService.UpdateAsync(order);
 
         decimal amound = Math.Round(session.AmountTotal / 100m ?? 0.00m, 2);
         var payment = new Payment
@@ -140,7 +148,7 @@ public class StripeWebhookcontroller : ControllerBase
             Status = "Paid",
             TransactionReference = charge!.Id
         };
-        await _service.PaymentAddAsync(payment);
+        await _paymentService.AddAsync(payment);
 
         // send email
     }

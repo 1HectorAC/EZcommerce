@@ -8,24 +8,24 @@ namespace EZcommerce.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IEZcommerceService _service;
+    private readonly IProductService _productService;
     private readonly ICartService _cart;
 
-    public HomeController(IEZcommerceService service, ICartService cart)
+    public HomeController(IProductService service, ICartService cart)
     {
-        _service = service;
+        _productService = service;
         _cart = cart;
     }
 
     public async Task<IActionResult> Index()
     {
-        var products = await _service.ProductGetAllWithInventoryAndCategoryAsync();
+        var products = await _productService.GetAllWithInventoryAndCategoryAsync();
         return View(products);
     }
 
     public async Task<IActionResult> ProductDetails(int id)
     {
-        var product = await _service.ProductGetByIdWithInventoryAndCategoryAsync(id);
+        var product = await _productService.GetByIdWithInventoryAndCategoryAsync(id);
         if(product is null)
         {
             return RedirectToAction("Home", "Index");
