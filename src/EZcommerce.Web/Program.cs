@@ -46,7 +46,6 @@ builder.Services.AddDbContext<EZcommerceDbContext>(
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<EZcommerce.Web.Services.CheckoutService>();
-builder.Services.AddScoped<IEZcommerceRepository, EZcommerceRepository>();
 builder.Services.AddScoped<IEZcommerceService, EZcommerceService>();
 builder.Services.AddScoped<IProductService, EZcommerce.Web.Services.Implementations.ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();

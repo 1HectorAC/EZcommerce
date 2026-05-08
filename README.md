@@ -22,7 +22,7 @@ A simple ecommerce platform with secure payments and admin management tools.
 ## How to run:
 1) Have .NET Runtime and SQL Server installed
 2) Main project is in src/EZcommerce.Web folder. Any following commands in done in this folder
-2) Add .env file. There is and Example file (ExampleEnv.txt), Add db connection string and stripe api keys
+2) Add .env file. There is and Example file (ExampleEnv.txt), Add db connection string, stripe api keys, and initial Admin Email&Password
 3) Update database based on migration files. Can be done with dotnet ef cli tool:
 `dotnet ef database update`
 4) Run the application with:
