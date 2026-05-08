@@ -33,7 +33,7 @@
                                asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav ms-auto">   
+                    <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
                             <a class="nav-link text-dark shoppingCartSection" asp-controller="Cart" asp-action="Index">
                                 <span class="material-symbols-outlined">
@@ -42,7 +42,10 @@
                                 <span style="font-size:16px; font-weight:500;">
                                     (@await Component.InvokeAsync("CartCount") )
                                 </span>
-                            </a> 
+                            </a>
+                            <li class="nav-item">
+                                <partial name="_LoginPartial" />
+                            </li>
                         </li>
                     </ul>
                 </div>

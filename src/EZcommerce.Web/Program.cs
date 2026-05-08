@@ -12,16 +12,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 //var connectionString = builder.Configuration.GetConnectionString("AppIdentityDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AppIdentityDbContextConnection' not found.");;
 
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("STRIPE"));
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -58,6 +54,29 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
 var app = builder.Build();
+
+// Handle initital admin user creation if none exits
+using(var scope = app.Services.CreateScope())
+{
+    var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? throw new Exception("No AdminEmail env. var. provided");
+    var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? throw new Exception("No AdminPassword env. var. provided");
+    var adminRole = "Admin";
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    
+    // Check if admin role exits and create
+    if(!await roleManager.RoleExistsAsync(adminRole))
+    {
+        await roleManager.CreateAsync(new IdentityRole(adminRole));
+    }
+
+    if(await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var user = new IdentityUser {UserName=adminEmail, Email=adminEmail};
+        await userManager.CreateAsync(user, adminPassword);
+        await userManager.AddToRoleAsync(user, adminRole);
+    }
+}
 
 // Setup global Stripe Api setting, 
 //resolve error when calling ChargeService and not finding secret key
