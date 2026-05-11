@@ -13,8 +13,6 @@ public interface ICartService
 
     int GetCartItemQuantity(int productId);
 
-    decimal GetTotalPrice();
-
     void SaveCart(List<CartItem> cart);
 
     void AddToCart(CartItem cartItem);
