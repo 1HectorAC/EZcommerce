@@ -45,7 +45,7 @@ builder.Services.AddDbContext<EZcommerceDbContext>(
     options => options.UseSqlServer(Environment.GetEnvironmentVariable("DB_Connection")));
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<EZcommerce.Web.Services.CheckoutService>();
+builder.Services.AddScoped<ICheckoutService, EZcommerce.Web.Services.Implementations.CheckoutService>();
 builder.Services.AddScoped<IEZcommerceService, EZcommerceService>();
 builder.Services.AddScoped<IProductService, EZcommerce.Web.Services.Implementations.ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -57,6 +57,7 @@ var app = builder.Build();
 // Handle initital admin user creation if none exits
 using(var scope = app.Services.CreateScope())
 {
+    Console.WriteLine("Checking if admin user exits");
     var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? throw new Exception("No AdminEmail env. var. provided");
     var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? throw new Exception("No AdminPassword env. var. provided");
     var adminRole = "Admin";
@@ -67,6 +68,8 @@ using(var scope = app.Services.CreateScope())
     if(!await roleManager.RoleExistsAsync(adminRole))
     {
         await roleManager.CreateAsync(new IdentityRole(adminRole));
+        Console.WriteLine("Admin role is created");
+
     }
 
     if(await userManager.FindByEmailAsync(adminEmail) == null)
@@ -74,6 +77,7 @@ using(var scope = app.Services.CreateScope())
         var user = new IdentityUser {UserName=adminEmail, Email=adminEmail};
         await userManager.CreateAsync(user, adminPassword);
         await userManager.AddToRoleAsync(user, adminRole);
+        Console.WriteLine("Admin user is created");
     }
 }
 

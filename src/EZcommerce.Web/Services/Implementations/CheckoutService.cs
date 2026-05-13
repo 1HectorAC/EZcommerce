@@ -6,9 +6,9 @@ using Stripe;
 using Stripe.Checkout;
 using Microsoft.Extensions.Options;
 
-namespace EZcommerce.Web.Services;
+namespace EZcommerce.Web.Services.Implementations;
 
-public class CheckoutService
+public class CheckoutService: ICheckoutService
 {
     private readonly StripeSettings _stripeSettings;
     private readonly StripeClient _client;

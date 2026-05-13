@@ -16,7 +16,7 @@ public class StripeWebhookcontroller : ControllerBase
 {
 
     private readonly StripeSettings _stripeSettings;
-    private readonly Services.CheckoutService _checkoutService;
+    private readonly ICheckoutService _checkoutService;
     private readonly IEZcommerceService _service;
     private readonly IOrderService _orderService;
     private readonly IPaymentService _paymentService;
@@ -24,7 +24,7 @@ public class StripeWebhookcontroller : ControllerBase
     public StripeWebhookcontroller(
         IOptions<StripeSettings> stripeSettings,
          IEZcommerceService service,
-          EZcommerce.Web.Services.CheckoutService checkoutService,
+          ICheckoutService checkoutService,
           IOrderService orderService,
           IPaymentService paymentService
           )

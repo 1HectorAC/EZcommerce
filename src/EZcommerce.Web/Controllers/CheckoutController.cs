@@ -1,9 +1,5 @@
-
-using EZcommerce.Web.Data;
-using EZcommerce.Web.Models;
 using EZcommerce.Web.Models.Session;
 using EZcommerce.Web.Services;
-using EZcommerce.Web.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EZcommerce.Web.Controllers;
@@ -12,10 +8,10 @@ namespace EZcommerce.Web.Controllers;
 public class CheckoutController: Controller
 {
     
-    private readonly CheckoutService _checkoutService;
+    private readonly ICheckoutService _checkoutService;
     private readonly IEZcommerceService _service;
     private readonly ICartService _cartService;
-    public CheckoutController(CheckoutService checkoutService, IEZcommerceService service, ICartService cartService)
+    public CheckoutController(ICheckoutService checkoutService, IEZcommerceService service, ICartService cartService)
     {
         _checkoutService = checkoutService;
         _service = service;
